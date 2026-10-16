@@ -1,0 +1,3506 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBA SMP IT Mentari Ilmu 2026</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mentari: {
+                            DEFAULT: '#2E473E',
+                            dark: '#1e3029',
+                            light: '#3d5c50',
+                            accent: '#4B7063',
+                            bg: '#f4f7f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- jsPDF & AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Rundown: selalu tampilkan deskripsi lengkap, termasuk di layar HP */
+        .rundown-description {
+            white-space: pre-line;
+            overflow-wrap: anywhere;
+            word-break: normal;
+            line-height: 1.6;
+            min-width: 260px;
+        }
+        @media (max-width: 767px) {
+            #view-rundown .rundown-table-wrap { overflow: visible !important; }
+            #view-rundown table { display: block; width: 100%; }
+            #view-rundown thead { display: none; }
+            #view-rundown tbody { display: block; width: 100%; }
+            #view-rundown tbody tr {
+                display: block;
+                margin: 0 0 14px;
+                padding: 8px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                background: #fff;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, .05);
+            }
+            #view-rundown tbody td {
+                display: grid;
+                grid-template-columns: 92px minmax(0, 1fr);
+                gap: 8px;
+                width: 100%;
+                min-width: 0;
+                padding: 9px 0 !important;
+                border-bottom: 1px solid #f1f5f9;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+            }
+            #view-rundown tbody td:last-child { border-bottom: 0; }
+            #view-rundown tbody td::before {
+                content: attr(data-label);
+                color: #64748b;
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                line-height: 1.5;
+            }
+            #view-rundown tbody td.rundown-description-cell {
+                display: block;
+                padding: 12px 0 !important;
+                color: #334155;
+                min-width: 0;
+            }
+            #view-rundown tbody td.rundown-description-cell::before {
+                display: block;
+                margin-bottom: 7px;
+            }
+            #view-rundown tbody td.rundown-description-cell .rundown-description {
+                min-width: 0;
+                width: 100%;
+                white-space: pre-line;
+                overflow-wrap: anywhere;
+            }
+            #view-rundown tbody td.rundown-detail-cell {
+                display: flex;
+                justify-content: flex-end;
+            }
+            #view-rundown tbody td.rundown-detail-cell::before { content: none; }
+            #view-rundown tbody td[colspan] { display: block; }
+            #view-rundown tbody td[colspan]::before { content: none; }
+        }
+        .stat-card { border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; padding: 16px; box-shadow: 0 1px 3px rgba(15,23,42,.05); min-width: 0; }
+        .stat-card .stat-value { font-size: 1.65rem; line-height: 1.2; font-weight: 800; color: #1e3029; margin-top: 8px; }
+        .stat-card .stat-label { color: #64748b; font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+        .rundown-time-badge { display:inline-flex; align-items:center; gap:6px; border-radius:10px; padding:7px 9px; background:#dbeafe; border:1px solid #93c5fd; color:#1d4ed8; font-weight:800; white-space:normal; }
+        .rundown-pj-badge { display:inline-block; border-radius:10px; padding:7px 9px; background:#fef3c7; border:1px solid #fcd34d; color:#92400e; font-weight:700; line-height:1.45; }
+        .rundown-view-toggle button.active { background:#2E473E; color:white; border-color:#2E473E; }
+        @media (max-width: 767px) {
+          #view-rundown .rundown-mobile-table-mode .rundown-table-wrap { overflow-x:auto !important; }
+          #view-rundown .rundown-mobile-table-mode table { display:table; width:max-content; min-width:100%; }
+          #view-rundown .rundown-mobile-table-mode thead { display:table-header-group; }
+          #view-rundown .rundown-mobile-table-mode tbody { display:table-row-group; }
+          #view-rundown .rundown-mobile-table-mode tbody tr { display:table-row; margin:0; padding:0; border-radius:0; box-shadow:none; }
+          #view-rundown .rundown-mobile-table-mode tbody td { display:table-cell; width:auto; min-width:120px; padding:10px 12px !important; border-bottom:1px solid #e2e8f0; vertical-align:top; }
+          #view-rundown .rundown-mobile-table-mode tbody td::before { display:none; content:none; }
+          #view-rundown .rundown-mobile-table-mode tbody td.rundown-description-cell { display:table-cell; min-width:260px; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col md:flex-row overflow-hidden bg-mentari-bg text-slate-800">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-mentari text-white flex items-center justify-between p-4 z-30 shadow-md">
+        <div class="flex items-center space-x-3">
+            <img src="https://mentariilmu.org/logo.png" alt="Logo" class="h-9 w-9 object-contain bg-white rounded-full p-1" onerror="this.src='https://placehold.co/40x40/2E473E/ffffff?text=MI'">
+            <div>
+                <h1 class="font-bold text-sm leading-tight">DBA SMP IT Mentari Ilmu</h1>
+                <p class="text-xs text-slate-200">Karawang • 16-17 Okt 2026</p>
+            </div>
+        </div>
+        <button id="mobile-menu-btn" class="text-white focus:outline-none text-xl p-1">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Drawer Overlay -->
+    <div id="mobile-drawer" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden transition-opacity">
+        <div class="absolute left-0 top-0 bottom-0 w-72 bg-mentari text-white p-5 flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-mentari-light">
+                <div class="flex items-center space-x-3">
+                    <img src="https://mentariilmu.org/logo.png" alt="Logo" class="h-10 w-10 object-contain bg-white rounded-full p-1" onerror="this.src='https://placehold.co/40x40/2E473E/ffffff?text=MI'">
+                    <div>
+                        <h2 class="font-bold text-base leading-tight">SMP IT Mentari Ilmu</h2>
+                        <p class="text-xs text-emerald-200">Kegiatan DBA 2026</p>
+                    </div>
+                </div>
+                <button id="mobile-close-btn" class="text-white text-xl p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <nav class="space-y-2 flex-1">
+                <button onclick="switchPage('dashboard'); toggleMobileMenu();" class="mobile-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="dashboard"><i class="fa-solid fa-chart-pie w-5 text-center"></i><span>Dashboard</span></button>
+                <button onclick="switchPage('peserta'); toggleMobileMenu();" class="mobile-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light active-nav" data-page="peserta">
+                    <i class="fa-solid fa-users w-5 text-center"></i>
+                    <span>Data Peserta</span>
+                </button>
+                <button onclick="switchPage('kesehatan'); toggleMobileMenu();" class="mobile-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="kesehatan">
+                    <i class="fa-solid fa-notes-medical w-5 text-center"></i>
+                    <span>Kesehatan Peserta</span>
+                </button>
+                <button onclick="switchPage('rundown'); toggleMobileMenu();" class="mobile-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="rundown">
+                    <i class="fa-solid fa-calendar-days w-5 text-center"></i>
+                    <span>Rundown Acara</span>
+                </button>
+                <button onclick="switchPage('outbound'); toggleMobileMenu();" class="mobile-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="outbound">
+                    <i class="fa-solid fa-person-hiking w-5 text-center"></i>
+                    <span>Outbound</span>
+                </button>
+            </nav>
+            <div class="pt-4 border-t border-mentari-light text-xs text-emerald-200 text-center">
+                Sari Ater Campervan, Subang
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden md:flex md:w-72 bg-mentari text-white flex-col shadow-xl z-20 flex-shrink-0">
+        <div class="p-6 border-b border-mentari-light flex items-center space-x-3">
+            <img src="https://mentariilmu.org/logo.png" alt="Logo" class="h-11 w-11 object-contain bg-white rounded-full p-1.5 shadow" onerror="this.src='https://placehold.co/44x44/2E473E/ffffff?text=MI'">
+            <div>
+                <h1 class="font-bold text-base leading-tight">SMP IT Mentari Ilmu</h1>
+                <p class="text-xs text-emerald-200 font-medium">Karawang</p>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-mentari-dark bg-opacity-45 border-b border-mentari-light">
+            <div class="text-xs font-semibold text-emerald-300 uppercase tracking-wider">Event Utama</div>
+            <div class="font-bold text-sm mt-0.5">Discipline and Bright Attitude (DBA)</div>
+            <div class="text-xs text-slate-300 mt-1 flex items-center">
+                <i class="fa-regular fa-calendar mr-1.5 text-emerald-300"></i> 16–17 Oktober 2026
+            </div>
+            <div class="text-xs text-slate-300 mt-0.5 flex items-center">
+                <i class="fa-solid fa-location-dot mr-1.5 text-emerald-300"></i> Sari Ater, Subang
+            </div>
+        </div>
+        <nav class="p-4 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
+            <button onclick="switchPage('dashboard')" class="desktop-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="dashboard"><i class="fa-solid fa-chart-pie w-5 text-center text-emerald-300"></i><span>Dashboard</span></button>
+            <button onclick="switchPage('peserta')" class="desktop-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light active-nav bg-mentari-light shadow-sm" data-page="peserta">
+                <i class="fa-solid fa-users w-5 text-center text-emerald-300"></i>
+                <span>Data Peserta</span>
+            </button>
+            <button onclick="switchPage('kesehatan')" class="desktop-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="kesehatan">
+                <i class="fa-solid fa-notes-medical w-5 text-center text-emerald-300"></i>
+                <span>Kesehatan Peserta</span>
+            </button>
+            <button onclick="switchPage('rundown')" class="desktop-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="rundown">
+                <i class="fa-solid fa-calendar-days w-5 text-center text-emerald-300"></i>
+                <span>Rundown Acara</span>
+            </button>
+            <button onclick="switchPage('outbound')" class="desktop-nav-link w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-left font-medium text-sm hover:bg-mentari-light" data-page="outbound">
+                <i class="fa-solid fa-person-hiking w-5 text-center text-emerald-300"></i>
+                <span>Outbound</span>
+            </button>
+        </nav>
+        <div class="p-4 border-t border-mentari-light text-center text-xs text-emerald-200">
+            Frontend-Only Local App • v2.6
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Top Action Bar / Breadcrumb -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm z-10">
+            <div class="flex items-center space-x-3">
+                <div id="page-icon-header" class="h-10 w-10 rounded-xl bg-emerald-50 text-mentari flex items-center justify-center font-bold text-lg shadow-sm">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <h2 id="page-title-header" class="text-lg font-bold text-slate-800 leading-tight">Data Peserta</h2>
+                    <p id="page-desc-header" class="text-xs text-slate-500">Daftar lengkap siswa peserta kegiatan DBA SMP IT Mentari Ilmu</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                    Live Data Loaded
+                </span>
+            </div>
+        </header>
+
+        <!-- Pages Container -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-6">
+
+            <!-- DASHBOARD -->
+            <section id="view-dashboard" class="space-y-6 hidden animate-fadeIn">
+                <div class="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-start gap-3"><div class="h-11 w-11 rounded-xl bg-emerald-50 text-mentari flex items-center justify-center text-xl"><i class="fa-solid fa-chart-pie"></i></div><div><h3 class="text-lg font-bold text-slate-800">Dashboard Kegiatan DBA</h3><p class="text-sm text-slate-500">Ringkasan data peserta, kesehatan, rundown, dan outbound.</p></div></div>
+                </div>
+                <div class="grid grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5">
+                    <div class="stat-card"><div class="flex items-center justify-between gap-2"><span class="stat-label">Total Peserta</span><i class="fa-solid fa-users text-emerald-700"></i></div><div id="dash-total-peserta" class="stat-value">0</div><p class="text-xs text-slate-500 mt-1">Seluruh siswa terdaftar</p></div>
+                    <div class="stat-card"><div class="flex items-center justify-between gap-2"><span class="stat-label">Total Laki-laki</span><i class="fa-solid fa-person text-blue-600"></i></div><div id="dash-total-laki" class="stat-value">0</div><p class="text-xs text-slate-500 mt-1">Peserta laki-laki</p></div>
+                    <div class="stat-card"><div class="flex items-center justify-between gap-2"><span class="stat-label">Total Perempuan</span><i class="fa-solid fa-person-dress text-pink-600"></i></div><div id="dash-total-perempuan" class="stat-value">0</div><p class="text-xs text-slate-500 mt-1">Peserta perempuan</p></div>
+                    <div class="stat-card"><div class="flex items-center justify-between gap-2"><span class="stat-label">Catatan Kesehatan</span><i class="fa-solid fa-notes-medical text-amber-600"></i></div><div id="dash-total-kesehatan" class="stat-value">0</div><p class="text-xs text-slate-500 mt-1">Data kesehatan peserta</p></div>
+                    <div class="stat-card"><div class="flex items-center justify-between gap-2"><span class="stat-label">Agenda Rundown</span><i class="fa-solid fa-calendar-days text-indigo-600"></i></div><div id="dash-total-rundown" class="stat-value">0</div><p class="text-xs text-slate-500 mt-1">Agenda Jumat dan Sabtu</p></div>
+                    <div class="stat-card"><div class="flex items-center justify-between gap-2"><span class="stat-label">Pos Outbound</span><i class="fa-solid fa-person-hiking text-orange-600"></i></div><div id="dash-total-outbound" class="stat-value">0</div><p class="text-xs text-slate-500 mt-1">Pos/kegiatan outbound</p></div>
+                </div>
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-800 mb-3">Akses Cepat</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-3"><button onclick="switchPage('peserta')" class="p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left"><i class="fa-solid fa-users text-mentari"></i><div class="font-semibold text-sm mt-2">Daftar Peserta</div></button><button onclick="switchPage('kesehatan')" class="p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left"><i class="fa-solid fa-notes-medical text-mentari"></i><div class="font-semibold text-sm mt-2">Kesehatan</div></button><button onclick="switchPage('rundown')" class="p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left"><i class="fa-solid fa-calendar-days text-mentari"></i><div class="font-semibold text-sm mt-2">Rundown</div></button><button onclick="switchPage('outbound')" class="p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-left"><i class="fa-solid fa-person-hiking text-mentari"></i><div class="font-semibold text-sm mt-2">Outbound</div></button></div></div>
+            </section>
+
+            <!-- PAGE 1: DATA PESERTA -->
+            <section id="view-peserta" class="space-y-6 animate-fadeIn">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3"><div class="stat-card"><div class="stat-label">Total Peserta</div><div id="stat-peserta-total" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Laki-laki</div><div id="stat-peserta-laki" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Perempuan</div><div id="stat-peserta-perempuan" class="stat-value">0</div></div></div>
+                <!-- Filter & Search Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cari Peserta</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="text" id="search-peserta" oninput="filterPeserta()" placeholder="Cari berdasarkan nama siswa..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Kelas</label>
+                            <select id="filter-kelas-peserta" onchange="filterPeserta()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Jenis Kelamin</label>
+                            <select id="filter-gender-peserta" onchange="filterPeserta()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Jenis Kelamin</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Ukuran Pakaian</label>
+                            <select id="filter-ukuran-peserta" onchange="filterPeserta()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Ukuran</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 gap-3">
+                        <div class="text-xs text-slate-500 font-medium">
+                            Menampilkan <span id="count-peserta-filtered" class="font-bold text-mentari">0</span> dari <span id="count-peserta-total" class="font-bold">0</span> data peserta
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="resetPesertaFilter()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reset Filter</span>
+                            </button>
+                            <button onclick="exportExcelPeserta()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Export Excel</span>
+                            </button>
+                            <button onclick="exportPdfPeserta()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Peserta -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto rundown-table-wrap">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                                    <th class="py-3.5 px-4 w-16 text-center">No.</th>
+                                    <th class="py-3.5 px-6">Nama Lengkap Siswa</th>
+                                    <th class="py-3.5 px-6">Kelas</th>
+                                    <th class="py-3.5 px-6">Jenis Kelamin</th>
+                                    <th class="py-3.5 px-6">Ukuran Pakaian</th>
+                                    <th class="py-3.5 px-4 text-center w-24">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-peserta-body" class="divide-y divide-slate-100 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 2: KESEHATAN PESERTA -->
+            <section id="view-kesehatan" class="space-y-6 hidden animate-fadeIn">
+<div class="grid grid-cols-2 md:grid-cols-5 gap-3"><div class="stat-card"><div class="stat-label">Total Peserta</div><div id="stat-kesehatan-total" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Laki-laki</div><div id="stat-kesehatan-laki" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Perempuan</div><div id="stat-kesehatan-perempuan" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Ada Kondisi Khusus</div><div id="stat-kesehatan-khusus" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Tidak Ada Kondisi</div><div id="stat-kesehatan-normal" class="stat-value">0</div></div></div>
+                <!-- Filter & Search Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cari Data Kesehatan</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="text" id="search-kesehatan" oninput="filterKesehatan()" placeholder="Cari nama, kondisi kesehatan, atau alergi..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Kelas</label>
+                            <select id="filter-kelas-kesehatan" onchange="filterKesehatan()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Kelas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Jenis Kelamin</label>
+                            <select id="filter-gender-kesehatan" onchange="filterKesehatan()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Jenis Kelamin</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Kondisi Khusus</label>
+                            <select id="filter-kondisi-kesehatan" onchange="filterKesehatan()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Kondisi</option>
+                                <option value="ada">Ada Catatan Medis / Khusus</option>
+                                <option value="tidak">Tidak Ada / Normal (-)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 gap-3">
+                        <div class="text-xs text-slate-500 font-medium">
+                            Menampilkan <span id="count-kesehatan-filtered" class="font-bold text-mentari">0</span> dari <span id="count-kesehatan-total" class="font-bold">0</span> data kesehatan
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="resetKesehatanFilter()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reset Filter</span>
+                            </button>
+                            <button onclick="exportExcelKesehatan()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Export Excel</span>
+                            </button>
+                            <button onclick="exportPdfKesehatan()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Kesehatan -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto rundown-table-wrap">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                                    <th class="py-3.5 px-4 w-12 text-center">No.</th>
+                                    <th class="py-3.5 px-4">Nama Siswa</th>
+                                    <th class="py-3.5 px-4">Kelas</th>
+                                    <th class="py-3.5 px-4">Jenis Kelamin</th>
+                                    <th class="py-3.5 px-4">Ukuran</th>
+                                    <th class="py-3.5 px-4">Kondisi Kesehatan</th>
+                                    <th class="py-3.5 px-4">Alergi & Pemicu</th>
+                                    <th class="py-3.5 px-4">Informasi Obat</th>
+                                    <th class="py-3.5 px-4">Catatan Tambahan</th>
+                                    <th class="py-3.5 px-4 text-center w-20">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-kesehatan-body" class="divide-y divide-slate-100 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 3: RUNDOWN ACARA -->
+            <section id="view-rundown" class="space-y-6 hidden animate-fadeIn">
+                <!-- Day Tabs & Filter Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex bg-slate-100 p-1 rounded-xl">
+                            <button onclick="switchRundownDay('jumat')" id="tab-day-jumat" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-bold transition bg-mentari text-white shadow-sm">
+                                Jumat, 16 Okt 2026
+                            </button>
+                            <button onclick="switchRundownDay('sabtu')" id="tab-day-sabtu" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">
+                                Sabtu, 17 Okt 2026
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="exportExcelRundown()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Export Excel</span>
+                            </button>
+                            <button onclick="exportPdfRundown()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cari Kegiatan</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="text" id="search-rundown" oninput="filterRundown()" placeholder="Cari kegiatan atau deskripsi..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Penanggung Jawab (PJ)</label>
+                            <select id="filter-pj-rundown" onchange="filterRundown()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua PJ</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="resetRundownFilter()" class="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reset Filter</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile display mode toggle; grid is default -->
+                <div class="rundown-view-toggle flex md:hidden items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-3">
+                    <span class="text-xs font-bold text-slate-600">Mode tampilan</span>
+                    <div class="flex gap-2"><button id="rundown-mode-grid" onclick="setRundownViewMode('grid')" class="active border rounded-lg px-3 py-2 text-xs font-bold"><i class="fa-solid fa-grip mr-1"></i>Grid</button><button id="rundown-mode-table" onclick="setRundownViewMode('table')" class="border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-600"><i class="fa-solid fa-table mr-1"></i>Tabel</button></div>
+                </div>
+                <!-- Table Rundown -->
+                <div id="rundown-results-wrap" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto rundown-table-wrap">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                                    <th class="py-3.5 px-4 w-36">Waktu</th>
+                                    <th class="py-3.5 px-6">Kegiatan</th>
+                                    <th class="py-3.5 px-5">Penanggung Jawab (PJ)</th>
+                                    <th class="py-3.5 px-6">Deskripsi & Rincian</th>
+                                    <th class="py-3.5 px-5">Tools / Perlengkapan</th>
+                                    <th class="py-3.5 px-4 text-center w-20">Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-rundown-body" class="divide-y divide-slate-100 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 4: OUTBOUND -->
+            <section id="view-outbound" class="space-y-6 hidden animate-fadeIn">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3"><div class="stat-card"><div class="stat-label">Total Agenda Hari Ini</div><div id="stat-rundown-hari" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Total Agenda Keseluruhan</div><div id="stat-rundown-total" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Jumlah PJ Hari Ini</div><div id="stat-rundown-pj" class="stat-value">0</div></div></div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3"><div class="stat-card"><div class="stat-label">Total Pos Outbound</div><div id="stat-outbound-total" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">Sesi Kegiatan</div><div id="stat-outbound-sesi" class="stat-value">0</div></div><div class="stat-card"><div class="stat-label">PJ / Penjaga</div><div id="stat-outbound-pj" class="stat-value">0</div></div></div>
+                <!-- Filter & Search Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Cari Pos / Outbound</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="text" id="search-outbound" oninput="filterOutbound()" placeholder="Cari nama pos, PJ, atau aktivitas..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter Sesi Kegiatan</label>
+                            <select id="filter-sesi-outbound" onchange="filterOutbound()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua Sesi Outbound</option>
+                                <option value="Survival Tracking">Survival Tracking</option>
+                                <option value="Pos-posan Malam">Pos-posan Malam & Pengondisian</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wider">Filter PJ / Penjaga</label>
+                            <select id="filter-pj-outbound" onchange="filterOutbound()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mentari focus:bg-white transition">
+                                <option value="">Semua PJ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 gap-3">
+                        <div class="text-xs text-slate-500 font-medium">
+                            Menampilkan <span id="count-outbound-filtered" class="font-bold text-mentari">0</span> dari <span id="count-outbound-total" class="font-bold">0</span> pos outbound
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="resetOutboundFilter()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Reset Filter</span>
+                            </button>
+                            <button onclick="exportExcelOutbound()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Export Excel</span>
+                            </button>
+                            <button onclick="exportPdfOutbound()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>Export PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Outbound Cards Grid -->
+                <div id="outbound-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-scaleUp">
+            <div class="bg-mentari text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="h-9 w-9 rounded-lg bg-mentari-light flex items-center justify-center text-emerald-200">
+                        <i class="fa-solid fa-circle-info text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-title" class="font-bold text-base leading-tight">Detail Informasi</h3>
+                        <p class="text-xs text-emerald-200">SMP IT Mentari Ilmu - DBA 2026</p>
+                    </div>
+                </div>
+                <button onclick="closeDetailModal()" class="text-white hover:text-emerald-200 text-xl p-1.5">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto custom-scrollbar space-y-4 text-sm text-slate-700">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex justify-end">
+                <button onclick="closeDetailModal()" class="px-5 py-2 bg-mentari hover:bg-mentari-dark text-white text-xs font-semibold rounded-xl transition shadow-sm">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- REAL DATA SOURCES ---
+        const participantsData = [
+    {
+        "no": 1,
+        "name": "Shahnaz Qaisara Ardiansyah",
+        "kelas": "Atikah",
+        "ukuran": "M"
+    },
+    {
+        "no": 2,
+        "name": "Aliya Lukmita",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 3,
+        "name": "Qaireen Putri Choerozi",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 4,
+        "name": "Qirani Ainun Mahya",
+        "kelas": "Atikah",
+        "ukuran": "M"
+    },
+    {
+        "no": 5,
+        "name": "Shaqilla Khanza Innova",
+        "kelas": "Atikah",
+        "ukuran": "M"
+    },
+    {
+        "no": 6,
+        "name": "Venna Vania Putri",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 7,
+        "name": "Syakira Adha Alkautsar",
+        "kelas": "Rumaysha",
+        "ukuran": "L"
+    },
+    {
+        "no": 8,
+        "name": "Afiqah Alya Jazilah",
+        "kelas": "Rumaysha",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 9,
+        "name": "Nadia Zulfa Irdina",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 10,
+        "name": "Alvita Nur Almalia Candra",
+        "kelas": "Rumaysha",
+        "ukuran": "L"
+    },
+    {
+        "no": 11,
+        "name": "Maheswari Adreena Razqya",
+        "kelas": "Rumaysha",
+        "ukuran": "M"
+    },
+    {
+        "no": 12,
+        "name": "Nayla Orizae Perdana",
+        "kelas": "Rumaysha",
+        "ukuran": "XS"
+    },
+    {
+        "no": 13,
+        "name": "Hasya Sakhia Makhali",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 14,
+        "name": "Fathin Dhiya Atiqah",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 15,
+        "name": "Hutami Aila Lituhayu",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 16,
+        "name": "Hutami Aila Lituhayu",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 17,
+        "name": "Zara Qairenna Alexa",
+        "kelas": "Atikah",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 18,
+        "name": "Tsabita Hasna Andryana",
+        "kelas": "Atikah",
+        "ukuran": "M"
+    },
+    {
+        "no": 19,
+        "name": "Aisyah Husna Taqiyya",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 20,
+        "name": "Qirani Ainun Mahya",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 21,
+        "name": "Shaqilla Khanza Innova",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 22,
+        "name": "Galuh Jasmine Alanna",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 23,
+        "name": "Putri Alesha Zahra",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 24,
+        "name": "Fayza Rahmillah Pramudya Wardani",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 25,
+        "name": "Raden Radinka Alpriansha",
+        "kelas": "Zaid",
+        "ukuran": "S"
+    },
+    {
+        "no": 26,
+        "name": "M. Albern Waljusi Azhari",
+        "kelas": "Zaid",
+        "ukuran": "S"
+    },
+    {
+        "no": 27,
+        "name": "Azka Zia Maryadi",
+        "kelas": "Zaid",
+        "ukuran": "XS"
+    },
+    {
+        "no": 28,
+        "name": "Naufal Nabil Mumtaz",
+        "kelas": "Zaid",
+        "ukuran": "XL"
+    },
+    {
+        "no": 29,
+        "name": "Salman Alfarisi",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 30,
+        "name": "Kenzie Abbad Alvaro",
+        "kelas": "Zaid",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 31,
+        "name": "Syazwan Ilham Amsori",
+        "kelas": "Zaid",
+        "ukuran": "XL"
+    },
+    {
+        "no": 32,
+        "name": "Raya Tri Nur Prasatyo",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 33,
+        "name": "Bisma Yudhistira",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 34,
+        "name": "Hafiz Muzakki Dikusumah",
+        "kelas": "Zaid",
+        "ukuran": "XL"
+    },
+    {
+        "no": 35,
+        "name": "Mohammad Naufal Pratama",
+        "kelas": "Zaid",
+        "ukuran": "XL"
+    },
+    {
+        "no": 36,
+        "name": "Abidzar Bilal Attaya Wijaya",
+        "kelas": "Zaid",
+        "ukuran": "XL"
+    },
+    {
+        "no": 37,
+        "name": "Muhammad Habibi Rijaalul Khaq",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 38,
+        "name": "Hasna Nabila Marsya",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 39,
+        "name": "Muhammad Hadid Al Fatih As",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 40,
+        "name": "Dhafitha Raisya Nur Fakhira",
+        "kelas": "Rumaysha",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 41,
+        "name": "Humam Salman Al Rahman",
+        "kelas": "Zaid",
+        "ukuran": "S"
+    },
+    {
+        "no": 42,
+        "name": "Arthanya Sashikirana",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 43,
+        "name": "Maula Nayyara Prawira",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 44,
+        "name": "Amira Bilqis Salsabila",
+        "kelas": "Rumaysha",
+        "ukuran": "S"
+    },
+    {
+        "no": 45,
+        "name": "Eshita Rezkia Nida",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 46,
+        "name": "Sheila Aurelia",
+        "kelas": "Rumaysha",
+        "ukuran": "M"
+    },
+    {
+        "no": 47,
+        "name": "Carissa Putri Salam",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 48,
+        "name": "Eshita Rezkia Nida",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 49,
+        "name": "Ziva Faranissa Aznii Fahrudin",
+        "kelas": "Rumaysha",
+        "ukuran": "M"
+    },
+    {
+        "no": 50,
+        "name": "Aghna Aufa Sulaeman",
+        "kelas": "Rumaysha",
+        "ukuran": "M"
+    },
+    {
+        "no": 51,
+        "name": "Jasmin Aulia",
+        "kelas": "Rumaysha",
+        "ukuran": "S"
+    },
+    {
+        "no": 52,
+        "name": "Athaya Keisha Utama",
+        "kelas": "Rumaysha",
+        "ukuran": "S"
+    },
+    {
+        "no": 53,
+        "name": "Althea Khairullah Arifin",
+        "kelas": "Rumaysha",
+        "ukuran": "L"
+    },
+    {
+        "no": 54,
+        "name": "Putri Nabila Agustin",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 55,
+        "name": "Althea Khairullah Arifin",
+        "kelas": "Rumaysha",
+        "ukuran": "L"
+    },
+    {
+        "no": 56,
+        "name": "Lareinna Adzra Gifty Assyfatuhaifa",
+        "kelas": "Rumaysha",
+        "ukuran": "S"
+    },
+    {
+        "no": 57,
+        "name": "Naura Nadhifa Qotrunnada Salsabila",
+        "kelas": "Rumaysha",
+        "ukuran": "XL"
+    },
+    {
+        "no": 58,
+        "name": "Aleena Gavrila Suganda",
+        "kelas": "Rumaysha",
+        "ukuran": "S"
+    },
+    {
+        "no": 59,
+        "name": "Nafisa Aulia Shanum",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 60,
+        "name": "Kalila Nada Salsabila",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 61,
+        "name": "Akifa Nayla Meindra",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 62,
+        "name": "Aryasatya Ardhani",
+        "kelas": "Zaid",
+        "ukuran": "M"
+    },
+    {
+        "no": 63,
+        "name": "Aghna Aufa Sulaeman",
+        "kelas": "Rumaysha",
+        "ukuran": "S"
+    },
+    {
+        "no": 64,
+        "name": "Syaqilla Yumna Aurellia",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 65,
+        "name": "Anindita Khairinniswa Astuti",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 66,
+        "name": "Meysin Meylani",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    },
+    {
+        "no": 67,
+        "name": "Ariqa Fatina Hendrawan",
+        "kelas": "Atikah",
+        "ukuran": "S"
+    },
+    {
+        "no": 68,
+        "name": "Muhammad Zafran Arrasyid",
+        "kelas": "Zaid",
+        "ukuran": "3XL"
+    },
+    {
+        "no": 69,
+        "name": "Kalila Nada Salsabila",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 70,
+        "name": "Audi Novayola",
+        "kelas": "Atikah",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 71,
+        "name": "Abyan Syamil Kurniawan",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 72,
+        "name": "Faeyza Yafi Risandy",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 73,
+        "name": "Iqbal Adhiya Rahman",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 74,
+        "name": "Uwais Al Farizi Haidar Arsyad",
+        "kelas": "Ja'far",
+        "ukuran": "S"
+    },
+    {
+        "no": 75,
+        "name": "Alariq Zikry Alchalify",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 76,
+        "name": "Rashidqi Qowiyyu Kuncoro",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 77,
+        "name": "Muhammad Daffa Alghifari",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 78,
+        "name": "Muhammad Kenzie Purnama",
+        "kelas": "Ja'far",
+        "ukuran": "3XL"
+    },
+    {
+        "no": 79,
+        "name": "Rafka Dody Atallah",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 80,
+        "name": "Aditiya Pradana",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 81,
+        "name": "Muhammad Azmi Al Ghifari",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 82,
+        "name": "M. Akmal Ar Raafi",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 83,
+        "name": "M. Zidni Agakhan Ilmi",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 84,
+        "name": "Hisyam Qobus Arkana",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 85,
+        "name": "Akio Ibrahim Atallah",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 86,
+        "name": "Nararya Naufal Faith Dzaki",
+        "kelas": "Ja'far",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 87,
+        "name": "Aditya Alghani",
+        "kelas": "Ja'far",
+        "ukuran": "S"
+    },
+    {
+        "no": 88,
+        "name": "Muhammad Alfian Ghazalah",
+        "kelas": "Ja'far",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 89,
+        "name": "Muhammad Atharizz Rudianto",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 90,
+        "name": "Muhammad Izzuddin Fauzan Alghifari",
+        "kelas": "Ja'far",
+        "ukuran": "S"
+    },
+    {
+        "no": 91,
+        "name": "Fausta Hafiz Syandana",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 92,
+        "name": "Maula Yusuf Ibrahim",
+        "kelas": "Ja'far",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 93,
+        "name": "Muhammad Arfian Miftakhul Firdaus",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 94,
+        "name": "Mohamad Aufar Alfaridzy",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 95,
+        "name": "Dimas Shaka Al Ghazali",
+        "kelas": "Ja'far",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 96,
+        "name": "Fathan Al-Maisan Zhafar",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 97,
+        "name": "Fathan Al-Maisan Zhafar",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 98,
+        "name": "Muhammad Rayhan",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 99,
+        "name": "Kafka Izza Bactiar",
+        "kelas": "Ja'far",
+        "ukuran": "M"
+    },
+    {
+        "no": 100,
+        "name": "Muhammad Danendra Satria Wibawa",
+        "kelas": "Ja'far",
+        "ukuran": "L"
+    },
+    {
+        "no": 101,
+        "name": "M. Danendra Satria Wibawa",
+        "kelas": "Ja'far",
+        "ukuran": "XL"
+    },
+    {
+        "no": 102,
+        "name": "Muhammad Izzuddin Fauzan Alghifari",
+        "kelas": "Ja'far",
+        "ukuran": "S"
+    },
+    {
+        "no": 103,
+        "name": "Muhammad Maurits Al Muyassar",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 104,
+        "name": "Muhammad Fachry",
+        "kelas": "Zaid",
+        "ukuran": "S"
+    },
+    {
+        "no": 105,
+        "name": "Muhammad Hafidz Ikrom",
+        "kelas": "Zaid",
+        "ukuran": "M"
+    },
+    {
+        "no": 106,
+        "name": "Rasyid Fauzi Rahman",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 107,
+        "name": "Muhammad Maheswara Dharmajati",
+        "kelas": "Zaid",
+        "ukuran": "M"
+    },
+    {
+        "no": 108,
+        "name": "Kenzie Abbad Alvaro",
+        "kelas": "Zaid",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 109,
+        "name": "Azka Aldrich Barus",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 110,
+        "name": "Najjah Baedowi",
+        "kelas": "Zaid",
+        "ukuran": "XL"
+    },
+    {
+        "no": 111,
+        "name": "M. Zidni Agakhan Ilmi",
+        "kelas": "Zaid",
+        "ukuran": "M"
+    },
+    {
+        "no": 112,
+        "name": "Muhammad Faza Firdaus",
+        "kelas": "Zaid",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 113,
+        "name": "Maher Kamil Al Muaqli",
+        "kelas": "Zaid",
+        "ukuran": "S"
+    },
+    {
+        "no": 114,
+        "name": "Malta Hasanudin Eka Komara",
+        "kelas": "Zaid",
+        "ukuran": "L"
+    },
+    {
+        "no": 115,
+        "name": "Muhammad Fadhil Husain Ramadhan",
+        "kelas": "Zaid",
+        "ukuran": "M"
+    },
+    {
+        "no": 116,
+        "name": "Danesha Dira Putri",
+        "kelas": "Rumaysha",
+        "ukuran": "XXL"
+    },
+    {
+        "no": 117,
+        "name": "Akifa Nayla Meindra",
+        "kelas": "Atikah",
+        "ukuran": "XL"
+    },
+    {
+        "no": 118,
+        "name": "Aisyah Husna Taqqiya",
+        "kelas": "Atikah",
+        "ukuran": "L"
+    }
+];
+
+        const healthData = [
+    {
+        "no": 1,
+        "name": "Shahnaz Qaisara Ardiansyah",
+        "kelas": "Atikah",
+        "ukuran": "M",
+        "kondisi": "alergi atopic (alergi kulit) terhadap UPF (Ultra processing food), spt sosis, nugget atau bakso instan",
+        "alergi": "alergi atopic (alergi kulit) terhadap UPF (Ultra processing food), spt sosis, nugget atau bakso instan",
+        "obat": "Tidak",
+        "catatan": "Mohon dibantu diingatkan ke Shahnaz jika ada makanan yang mengandung UPF, ganti yang lain saja, terima kasih :)"
+    },
+    {
+        "no": 2,
+        "name": "Aliya Lukmita",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 3,
+        "name": "Qaireen Putri Choerozi",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Jika batuk suka sesak napas tp TDK punya asma",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 4,
+        "name": "Qirani Ainun Mahya",
+        "kelas": "Atikah",
+        "ukuran": "M",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak"
+    },
+    {
+        "no": 5,
+        "name": "Shaqilla Khanza Innova",
+        "kelas": "Atikah",
+        "ukuran": "M",
+        "kondisi": "Mimisan apabila panas",
+        "alergi": "-",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 6,
+        "name": "Venna Vania Putri",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak, hanya saja kalau terlalu cape suka pusing",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 7,
+        "name": "Syakira Adha Alkautsar",
+        "kelas": "Rumaysha",
+        "ukuran": "L",
+        "kondisi": "Mata kurang awas",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak"
+    },
+    {
+        "no": 8,
+        "name": "Afiqah Alya Jazilah",
+        "kelas": "Rumaysha",
+        "ukuran": "XXL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Pernah op hernia kanan kiri ketika usia 2 tahun kurang"
+    },
+    {
+        "no": 9,
+        "name": "Nadia Zulfa Irdina",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 10,
+        "name": "Alvita Nur Almalia Candra",
+        "kelas": "Rumaysha",
+        "ukuran": "L",
+        "kondisi": "tidak ada",
+        "alergi": "tidak ada",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 11,
+        "name": "Maheswari Adreena Razqya",
+        "kelas": "Rumaysha",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 12,
+        "name": "Nayla Orizae Perdana",
+        "kelas": "Rumaysha",
+        "ukuran": "XS",
+        "kondisi": "tidak ada",
+        "alergi": "makanan, udang",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 13,
+        "name": "Hasya Sakhia Makhali",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Riwayat Asma",
+        "alergi": "Alergi dingin, debu menyebabkan bersin-bersin",
+        "obat": "Tidak",
+        "catatan": "Hasya memiliki riwayat Asma, dan jika kelelahan sering memicu asmanya kambuh"
+    },
+    {
+        "no": 14,
+        "name": "Fathin Dhiya Atiqah",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak ada",
+        "alergi": "Bulu binatang",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 15,
+        "name": "Hutami Aila Lituhayu",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Animea",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 16,
+        "name": "Hutami Aila Lituhayu",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Animea",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 17,
+        "name": "Zara Qairenna Alexa",
+        "kelas": "Atikah",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Cepat batuk pilek kalau kebanyakan minum es",
+        "obat": "Tidak",
+        "catatan": "Kadang masih manja"
+    },
+    {
+        "no": 18,
+        "name": "Tsabita Hasna Andryana",
+        "kelas": "Atikah",
+        "ukuran": "M",
+        "kondisi": "Maagh",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tsabita makannya susah, jadi itu salah satu penyebab sakit maaghnya"
+    },
+    {
+        "no": 19,
+        "name": "Aisyah Husna Taqiyya",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 20,
+        "name": "Qirani Ainun Mahya",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak"
+    },
+    {
+        "no": 21,
+        "name": "Shaqilla Khanza Innova",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Mimisan apabila Panas",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Mohon di ingatkan utk makan"
+    },
+    {
+        "no": 22,
+        "name": "Galuh Jasmine Alanna",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tdk",
+        "alergi": "Tdk",
+        "obat": "Tidak",
+        "catatan": "Jika sdg menstruasi suka lemes"
+    },
+    {
+        "no": 23,
+        "name": "Putri Alesha Zahra",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "-",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Dahulu waktu kecil sebelum usia 5 tahun , pernah beberapa kali demam kejang dan di rawat tapi skrg sdh dinyatakan sehat. Hanya selama ini di jaga agar tidak terlalu kecapean dan makan teratur."
+    },
+    {
+        "no": 24,
+        "name": "Fayza Rahmillah Pramudya Wardani",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "tidak ada",
+        "alergi": "tidak ada",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 25,
+        "name": "Raden Radinka Alpriansha",
+        "kelas": "Zaid",
+        "ukuran": "S",
+        "kondisi": "tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 26,
+        "name": "M. Albern Waljusi Azhari",
+        "kelas": "Zaid",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 27,
+        "name": "Azka Zia Maryadi",
+        "kelas": "Zaid",
+        "ukuran": "XS",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 28,
+        "name": "Naufal Nabil Mumtaz",
+        "kelas": "Zaid",
+        "ukuran": "XL",
+        "kondisi": "Flu dan batuk biasa (sekarang sedang minum obat batuk dan flu biasa merk Alpara(Kandungannya Parasetamol,dextrometrophan))",
+        "alergi": "Alergi buah Naga",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 29,
+        "name": "Salman Alfarisi",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 30,
+        "name": "Kenzie Abbad Alvaro",
+        "kelas": "Zaid",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Anak terlalu agresif setiap kali explor di tempat yang baru"
+    },
+    {
+        "no": 31,
+        "name": "Syazwan Ilham Amsori",
+        "kelas": "Zaid",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Alergi antibiotik/gatal gatal",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 32,
+        "name": "Raya Tri Nur Prasatyo",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Radang dan Infeksi Pencernaan",
+        "alergi": "-",
+        "obat": "Tidak",
+        "catatan": "Hindari indomie"
+    },
+    {
+        "no": 33,
+        "name": "Bisma Yudhistira",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 34,
+        "name": "Hafiz Muzakki Dikusumah",
+        "kelas": "Zaid",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 35,
+        "name": "Mohammad Naufal Pratama",
+        "kelas": "Zaid",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 36,
+        "name": "Abidzar Bilal Attaya Wijaya",
+        "kelas": "Zaid",
+        "ukuran": "XL",
+        "kondisi": "Gerd",
+        "alergi": "Makanan pedas, dan harus makan teratur",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 37,
+        "name": "Muhammad Habibi Rijaalul Khaq",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 38,
+        "name": "Hasna Nabila Marsya",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak"
+    },
+    {
+        "no": 39,
+        "name": "Muhammad Hadid Al Fatih As",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Alergi",
+        "alergi": "Pemicu alergi : udara, asap, debu dan terlalu lelah",
+        "obat": "Tidak",
+        "catatan": "Jika alergi terjadi biasanya diawali bersin² ga berhenti, mata merah dan berair, hidung gatal dan berair. Berikan obat alergi (cetirizin)  dan kemudian menggunakan nebu (diuap)"
+    },
+    {
+        "no": 40,
+        "name": "Dhafitha Raisya Nur Fakhira",
+        "kelas": "Rumaysha",
+        "ukuran": "XXL",
+        "kondisi": "asalam, asma.",
+        "alergi": "alergi udang, sama telor negeri",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 41,
+        "name": "Humam Salman Al Rahman",
+        "kelas": "Zaid",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak",
+        "obat": "Ya",
+        "catatan": "Untuk kesehatan selama ini alhamdulilah tidak ada masalah"
+    },
+    {
+        "no": 42,
+        "name": "Arthanya Sashikirana",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "-",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 43,
+        "name": "Maula Nayyara Prawira",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 44,
+        "name": "Amira Bilqis Salsabila",
+        "kelas": "Rumaysha",
+        "ukuran": "S",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 45,
+        "name": "Eshita Rezkia Nida",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak adaTidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 46,
+        "name": "Sheila Aurelia",
+        "kelas": "Rumaysha",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Ya",
+        "catatan": "HB (Anemia) diminum  1 kali, sesudah bangun tidur pagi"
+    },
+    {
+        "no": 47,
+        "name": "Carissa Putri Salam",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada penyakit",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Jika aktivitas berat, mudah lelah"
+    },
+    {
+        "no": 48,
+        "name": "Eshita Rezkia Nida",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 49,
+        "name": "Ziva Faranissa Aznii Fahrudin",
+        "kelas": "Rumaysha",
+        "ukuran": "M",
+        "kondisi": "Mimisan saat kondisi fisik terpengaruh lingkungan luar seperti cuaca yg terlalu dingin atau terlalu panas atau kelelahan extrem",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Cuaca dingin akan memicu pilek yg biasanya memicu mimisan juga"
+    },
+    {
+        "no": 50,
+        "name": "Aghna Aufa Sulaeman",
+        "kelas": "Rumaysha",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 51,
+        "name": "Jasmin Aulia",
+        "kelas": "Rumaysha",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 52,
+        "name": "Athaya Keisha Utama",
+        "kelas": "Rumaysha",
+        "ukuran": "S",
+        "kondisi": "Memiliki empty sella syndrome, mudah pusing tiba2",
+        "alergi": "Alhamdulillah tidak ada",
+        "obat": "Ya",
+        "catatan": "Keisha bila merasa kepanasan yg tll lama akan pusing, diobati nya dengan rebahan saja"
+    },
+    {
+        "no": 53,
+        "name": "Althea Khairullah Arifin",
+        "kelas": "Rumaysha",
+        "ukuran": "L",
+        "kondisi": "Jika telat makan asam lambung gampang kambuh",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 54,
+        "name": "Putri Nabila Agustin",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Pemilih makanan"
+    },
+    {
+        "no": 55,
+        "name": "Althea Khairullah Arifin",
+        "kelas": "Rumaysha",
+        "ukuran": "L",
+        "kondisi": "Insyaallah Sehat",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "NA"
+    },
+    {
+        "no": 56,
+        "name": "Lareinna Adzra Gifty Assyfatuhaifa",
+        "kelas": "Rumaysha",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 57,
+        "name": "Naura Nadhifa Qotrunnada Salsabila",
+        "kelas": "Rumaysha",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 58,
+        "name": "Aleena Gavrila Suganda",
+        "kelas": "Rumaysha",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 59,
+        "name": "Nafisa Aulia Shanum",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "tidak ada",
+        "alergi": "tidak ada",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 60,
+        "name": "Kalila Nada Salsabila",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 61,
+        "name": "Akifa Nayla Meindra",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 62,
+        "name": "Aryasatya Ardhani",
+        "kelas": "Zaid",
+        "ukuran": "M",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 63,
+        "name": "Aghna Aufa Sulaeman",
+        "kelas": "Rumaysha",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 64,
+        "name": "Syaqilla Yumna Aurellia",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Secara keseluruhan kondisi aman"
+    },
+    {
+        "no": 65,
+        "name": "Anindita Khairinniswa Astuti",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak Ada",
+        "alergi": "Tidak Ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 66,
+        "name": "Meysin Meylani",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 67,
+        "name": "Ariqa Fatina Hendrawan",
+        "kelas": "Atikah",
+        "ukuran": "S",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Ariqa penyandang Thalasemia, tp tidak memiliki penyakit, hanya saja tidak boleh terlalu dicapek berlebihan."
+    },
+    {
+        "no": 68,
+        "name": "Muhammad Zafran Arrasyid",
+        "kelas": "Zaid",
+        "ukuran": "3XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 69,
+        "name": "Kalila Nada Salsabila",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 70,
+        "name": "Audi Novayola",
+        "kelas": "Atikah",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 71,
+        "name": "Abyan Syamil Kurniawan",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Cukup"
+    },
+    {
+        "no": 72,
+        "name": "Faeyza Yafi Risandy",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 73,
+        "name": "Iqbal Adhiya Rahman",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 74,
+        "name": "Uwais Al Farizi Haidar Arsyad",
+        "kelas": "Ja'far",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 75,
+        "name": "Alariq Zikry Alchalify",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "TIDAK",
+        "alergi": "TIDAK",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 76,
+        "name": "Rashidqi Qowiyyu Kuncoro",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "KLO kecapean bbrp kali mimisan",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 77,
+        "name": "Muhammad Daffa Alghifari",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 78,
+        "name": "Muhammad Kenzie Purnama",
+        "kelas": "Ja'far",
+        "ukuran": "3XL",
+        "kondisi": "Ada batuk, mohon bantuannya jg untuk porsi makan d beri takaran 🙏\nKrn kondisi bb nya masken sering agak susah tidur n cenderung rungsing",
+        "alergi": "Makanan manis n gurih (seperti snack) memicu batuk berlebih",
+        "obat": "Tidak",
+        "catatan": "Jika d tengah malam masken batuk berlebih mohon bantuannya diingatkan untuk membalur dgn vic"
+    },
+    {
+        "no": 79,
+        "name": "Rafka Dody Atallah",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Mimisan",
+        "alergi": "Alergi batuk faktor pencetus nya klo salah makan ,kebnyakan minum air es",
+        "obat": "Tidak",
+        "catatan": "Mohon selalu d ingatkan buat rafka  cara bljr nya beda sm sm anak anak yg lain malahan lbh fokus bljr dg gaya rafka sendiri mohon d mklumi pak ilham..dan klo pun ad hapalan mohon org tua d kasih tau biar di rumah lebih d arahkan lagi untuk beljr terima kasih pak ilham"
+    },
+    {
+        "no": 80,
+        "name": "Aditiya Pradana",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 81,
+        "name": "Muhammad Azmi Al Ghifari",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Mata sebelah kanan Azmi ada tailalat jangan terlalu lama kena cahaya matahari,menyebabkan merah dan gatal",
+        "alergi": "Mata jangan terlalu kena cahaya matahari",
+        "obat": "Tidak",
+        "catatan": "Cukup"
+    },
+    {
+        "no": 82,
+        "name": "M. Akmal Ar Raafi",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak",
+        "alergi": "Suka tiba2 bentol matanya, tp blm tau penyebabnya",
+        "obat": "Tidak",
+        "catatan": "Kl lelah yang terlalu bisa mimisan"
+    },
+    {
+        "no": 83,
+        "name": "M. Zidni Agakhan Ilmi",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak"
+    },
+    {
+        "no": 84,
+        "name": "Hisyam Qobus Arkana",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Kadang mabuk naik bis"
+    },
+    {
+        "no": 85,
+        "name": "Akio Ibrahim Atallah",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 86,
+        "name": "Nararya Naufal Faith Dzaki",
+        "kelas": "Ja'far",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 87,
+        "name": "Aditya Alghani",
+        "kelas": "Ja'far",
+        "ukuran": "S",
+        "kondisi": "Kulit nya sensitif",
+        "alergi": "Waktu kecil alergi dingin, tpi sudah dewasa g pernah kambuh",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 88,
+        "name": "Muhammad Alfian Ghazalah",
+        "kelas": "Ja'far",
+        "ukuran": "XXL",
+        "kondisi": "Takut pada ketinggian. Di karenakan pernah menjalani Operasi Besar (3,5 jam).",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Sudah saya coba dengan mengikuti kegiatan out Bond, ke tempat permainan di Dufan.  Tapi obat bius yang masuk ke  tubuh Alfian saat bayi  mempengaruhi detak jantung Alfian  saat berada di ketinggian. Alfian tetap  mencobanya  namun kurang nyaman yang di rasakannya."
+    },
+    {
+        "no": 89,
+        "name": "Muhammad Atharizz Rudianto",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 90,
+        "name": "Muhammad Izzuddin Fauzan Alghifari",
+        "kelas": "Ja'far",
+        "ukuran": "S",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Mohon dibantu mengingatkan untuk buang air kecil, sikat gigi, dan berwudhu sebelum tidur pak. Karena Fauzan kalau sudah ngantuk biasanya langsung tidur🙏"
+    },
+    {
+        "no": 91,
+        "name": "Fausta Hafiz Syandana",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "tidak ada",
+        "alergi": "tidak ada",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 92,
+        "name": "Maula Yusuf Ibrahim",
+        "kelas": "Ja'far",
+        "ukuran": "XXL",
+        "kondisi": "tidak ada",
+        "alergi": "tidak ada",
+        "obat": "Tidak",
+        "catatan": "pak ilham..anak saya dari kecil tidak makan nasi(tidak doyan nasi)\nmakan sehari2 roti/pasta/telor/chiken/kentang.\nmohon dimaklumi ya pak. Terimakasih"
+    },
+    {
+        "no": 93,
+        "name": "Muhammad Arfian Miftakhul Firdaus",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak Ada",
+        "alergi": "Tidak Ada",
+        "obat": "Tidak",
+        "catatan": "Tidak Ada"
+    },
+    {
+        "no": 94,
+        "name": "Mohamad Aufar Alfaridzy",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 95,
+        "name": "Dimas Shaka Al Ghazali",
+        "kelas": "Ja'far",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Alergi dingin ketika pagi terlalu lama di AC dan menyebabkan bersin2 dpagi hari saja.",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 96,
+        "name": "Fathan Al-Maisan Zhafar",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Kadang-kadang kulitnya suka gatal jika terkena debu"
+    },
+    {
+        "no": 97,
+        "name": "Fathan Al-Maisan Zhafar",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Kadang-kadang kulitnya suka gatal jika terkena debu"
+    },
+    {
+        "no": 98,
+        "name": "Muhammad Rayhan",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 99,
+        "name": "Kafka Izza Bactiar",
+        "kelas": "Ja'far",
+        "ukuran": "M",
+        "kondisi": "Tdk",
+        "alergi": "Tdk",
+        "obat": "Tidak",
+        "catatan": "Tdk ada"
+    },
+    {
+        "no": 100,
+        "name": "Muhammad Danendra Satria Wibawa",
+        "kelas": "Ja'far",
+        "ukuran": "L",
+        "kondisi": "Batuk, Pilek",
+        "alergi": "Belum diketahui",
+        "obat": "Tidak",
+        "catatan": "Periksa Mata"
+    },
+    {
+        "no": 101,
+        "name": "M. Danendra Satria Wibawa",
+        "kelas": "Ja'far",
+        "ukuran": "XL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 102,
+        "name": "Muhammad Izzuddin Fauzan Alghifari",
+        "kelas": "Ja'far",
+        "ukuran": "S",
+        "kondisi": "Tidak",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 103,
+        "name": "Muhammad Maurits Al Muyassar",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Mudah  mimisan jika terlalu lelah dan terpapar panas matahari  dalam kondisi lama",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak dianjurkan melakukan aktivitas fisik yang terlalu berat"
+    },
+    {
+        "no": 104,
+        "name": "Muhammad Fachry",
+        "kelas": "Zaid",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 105,
+        "name": "Muhammad Hafidz Ikrom",
+        "kelas": "Zaid",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tolong sering ingatkan minum air putih\nTerimakasih"
+    },
+    {
+        "no": 106,
+        "name": "Rasyid Fauzi Rahman",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Hanya sering pusing dan sakit perut"
+    },
+    {
+        "no": 107,
+        "name": "Muhammad Maheswara Dharmajati",
+        "kelas": "Zaid",
+        "ukuran": "M",
+        "kondisi": "Tidak ada.",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Mahes hrs d ingatkan minum air putihnya"
+    },
+    {
+        "no": 108,
+        "name": "Kenzie Abbad Alvaro",
+        "kelas": "Zaid",
+        "ukuran": "XXL",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "*"
+    },
+    {
+        "no": 109,
+        "name": "Azka Aldrich Barus",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 110,
+        "name": "Najjah Baedowi",
+        "kelas": "Zaid",
+        "ukuran": "XL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "tidak ada"
+    },
+    {
+        "no": 111,
+        "name": "M. Zidni Agakhan Ilmi",
+        "kelas": "Zaid",
+        "ukuran": "M",
+        "kondisi": "Tidak",
+        "alergi": "Tidak",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 112,
+        "name": "Muhammad Faza Firdaus",
+        "kelas": "Zaid",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "sensitif jika ada yg berbicara tentang gemuknya pak 🙏🏻"
+    },
+    {
+        "no": 113,
+        "name": "Maher Kamil Al Muaqli",
+        "kelas": "Zaid",
+        "ukuran": "S",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 114,
+        "name": "Malta Hasanudin Eka Komara",
+        "kelas": "Zaid",
+        "ukuran": "L",
+        "kondisi": "Kadang suka pusing sm mual",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Titip malta d sekolah"
+    },
+    {
+        "no": 115,
+        "name": "Muhammad Fadhil Husain Ramadhan",
+        "kelas": "Zaid",
+        "ukuran": "M",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 116,
+        "name": "Danesha Dira Putri",
+        "kelas": "Rumaysha",
+        "ukuran": "XXL",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    },
+    {
+        "no": 117,
+        "name": "Akifa Nayla Meindra",
+        "kelas": "Atikah",
+        "ukuran": "XL",
+        "kondisi": "Alhamdulillah tidak ada",
+        "alergi": "Alhamdulillah tidak ada",
+        "obat": "Tidak",
+        "catatan": "Tidak ada"
+    },
+    {
+        "no": 118,
+        "name": "Aisyah Husna Taqqiya",
+        "kelas": "Atikah",
+        "ukuran": "L",
+        "kondisi": "Tidak ada",
+        "alergi": "Tidak ada",
+        "obat": "Tidak",
+        "catatan": "-"
+    }
+];
+
+        const rundownData = [
+    {
+        "day": "jumat",
+        "waktu": "05.00-07.30",
+        "kegiatan": "Keberangkatan tim pendahulu",
+        "pj": "Pak Guntur",
+        "deskripsi": "Mengondisikan tempat untuk tenda dan pos posan (Pa Guntur, Pak Ilham, Bu Nuri, Bu Lilis, Miss Sukma). Miss Sukma menyiapkan sarapan untuk tim pendahulu",
+        "tools": ""
+    },
+    {
+        "day": "jumat",
+        "waktu": "05.30 - 06.15",
+        "kegiatan": "Berkumpul di lapangan sekolah",
+        "pj": "Pak Edy",
+        "deskripsi": "Mengondisikan siswa berkumpul di lapangan, memastikan siswa sudah lengkap . Bu Esta membagikan sarapan pada seluruh panitia dan supir. Pak Hanan memastikan trasnportasi sudah dilabeli dan para PJ telah menerima uang untuk pak Ogah juga memastikan obat-obatan sudah dibagikan ke PJ bus/truk. Bu Fresty membuka acara DBA. Menempel label di truk PAk Hanan",
+        "tools": "Toa dan presensi kelompok"
+    },
+    {
+        "day": "jumat",
+        "waktu": "06.15 - 09.00",
+        "kegiatan": "Pemberangkatan ke lokasi outing hotspring Ciater",
+        "pj": "Pak Edy",
+        "deskripsi": "Memastikan anak-anak sudah naik truk semua, mengabsen siswa, doa naik kendaraan, dan membaca al-ma'tsurat. PJ truk 1: Bu Rani, Michael PJ truk 2: Bu Endang,Ghina PJ truk 3: Pak Daffa, Bu Esta, Miss Sukma PJ truk 4: Pak Edy, MIss Dewi, PJ truk 5: Pak Hanan, Om Husein",
+        "tools": "Toa dan truk/bus, presensi tiap bus/truk, label truk/bus, sarapan dan minum supir, uang untuk Pak Ogah, Obat-obatan"
+    },
+    {
+        "day": "jumat",
+        "waktu": "09.00- 09.30",
+        "kegiatan": "Foto bersama dan Sholat Dhuha",
+        "pj": "Pak Edy",
+        "deskripsi": "Semua panitia dan siswa melakukan foto bersama dengan Pak Daffa mengomandoi tim media sebagai fotografer, setelah itu dilanjutkan melaksanakan solat dhuha di area kemah yang dipimpin oleh Pak Hanan. Siswa dikondisikan wudhu dan solatnya oleh Pak Edy dan tim acara (Bu Lilis, Bu Endang, Bu Nuri, Bu Rani, Pak Ilham)",
+        "tools": "speaker, mic, toa, terpal"
+    },
+    {
+        "day": "jumat",
+        "waktu": "09.30 - 10.00",
+        "kegiatan": "Apel Pembukaan",
+        "pj": "Bu Nuri",
+        "deskripsi": "Bu Nuri menyiapkan petugas dan peserta untuk apel. Petugas apel: MC: Naufal nabil, pembaca tilawah:Shahnaz, pembaca doa: Albern,  pemimpin pasukan:rafka, pemimpin barisan:nayla dan ghani dirigen: jasmine aulia. Pak Edi dan tim acara mengondisikan siswa untuk apel. Semua panitia mengikuti apel.",
+        "tools": "speaker, bendera merah putih dan dudukannya, endera mentari ilmu, teks MC, teks yang diperlukan, toa"
+    },
+    {
+        "day": "jumat",
+        "waktu": "10.00-10.30",
+        "kegiatan": "PBB",
+        "pj": "Pak Edy",
+        "deskripsi": "Pak Edy mengondisikan siswa berbaris di area kemah dan dilanjutkan dengan PBB yang akan dikomandoi oleh tentara utusan",
+        "tools": "Toa"
+    },
+    {
+        "day": "jumat",
+        "waktu": "10.30-11.20",
+        "kegiatan": "Membuat tenda",
+        "pj": "Pak Guntur",
+        "deskripsi": "Pak Guntur mengumumkan teknis posisi tenda dan menyampaikan durasi pembuatan tenda serta peraturan membangun tenda jika diperlukan. Akan ada penilaian emphatetic oleh masing-masing pemiming kelompok.",
+        "tools": "Label nama kelompok (dibuat sendiri oleh peserta), tenda dan perangkatnya, jurnal penilaian emphatetic"
+    },
+    {
+        "day": "jumat",
+        "waktu": "11.20-12.30",
+        "kegiatan": "Solat Jum'at/Solat dzuhur dan jamak taqdim, keputrian",
+        "pj": "Bu Lilis, Pak Edy",
+        "deskripsi": "Pak Edy dan tim acara mengondisikan siswa ikhwan untuk sholat Jum'at, Bu Nuri tim acara mengondisikan siswa akhwat untuk keputrian dan solat dzuhur. Bu Lilis mengisi keputrian: Menjalani masa Akil Baligh bagi Akhwat dan mengimami solat jamak taqdim dzuhur dan ashar. Keputrian bertempat di area kemah",
+        "tools": "Terpal, toa"
+    },
+    {
+        "day": "jumat",
+        "waktu": "12.30-13.00",
+        "kegiatan": "Istirahat dan Makan siang",
+        "pj": "Miss Sukma dan Bu Esta",
+        "deskripsi": "Miss Sukma dan Bu Esta menghidangkan makan siang. Pak Edy dan tim acara mengondisikan siswa untuk makan siang. Miss Sukma memimpin siswa berdoa dan menyampaikan pesan sebelum makan.",
+        "tools": "Toa, teks pesan sebelum makan, konsumsi makan siang"
+    },
+    {
+        "day": "jumat",
+        "waktu": "13.00-16.00",
+        "kegiatan": "Survival Tracking",
+        "pj": "Bu Lilis",
+        "deskripsi": "Seluruh siswa erkumpul di lapang kegiatan, eraris sesuai kelompok masing-masing dan meawakan yel-yel masing-masing dipimpin oleh Pak Edy. Setelah itu bagi kelompok yang bisa membawakan nasyid terlebih dahulu dan terbaik menjadi kelompok yang pertama outond. Selama menunggu giliran siswa lain melakukan murojaah bersama dari surat An-nas sampai At-tin. Pada pos-posan ini kelompok ikhwan didahulukan mengingat mereka akan melaksanakan solat ashar setelah outond.\n1. Pos 1: Penggunaan kompas, Bu Lilis dan Miss Dewi, religius, tantangan\n2. Pos 2: Semaphore, PJ: Pak Ilham. Penjaga pos Pak Ilham dan Bu Endang, tantangan emphatetic, dari pos 2 ke tubing PJ Pak Guntur. Dari tubing ke pos 3 PJ Bu Nuri\n3. Pos 3: Sandi kotak, PJ: Pak Edy. tantangan naik tubing manerly. Penjaga pos Pak Daffa dan bu Rani.",
+        "tools": "Toa, perlengkapan outond"
+    },
+    {
+        "day": "jumat",
+        "waktu": "15.30-16.00",
+        "kegiatan": "Solat Ashar siswa ikhwan",
+        "pj": "Pak Edy",
+        "deskripsi": "Setelah selesai pos-posan siswa ikhwan ganti aju di tenda lalu melaksanakn solat ashar di masjid secara ergiliran dan dipantau pelaksanaannya oleh Pak Edy",
+        "tools": "Toa, terpal"
+    },
+    {
+        "day": "jumat",
+        "waktu": "16.00 -  17.00",
+        "kegiatan": "Memasak",
+        "pj": "Bu Esta dan Miss Sukma",
+        "deskripsi": "siswa menyiapkan bahan-bahan masakan, mengeksekusi bahan masakan dan menyajikan masakan.  Bu Esta dan Miss Sukma memantau kegiatan siswa memasak dan memerikan penilaian  proses(emphatetic) dan hasil serta menentukan tempat untuk penilaian hasil masakan. Samil proses memasak oleh samil makan snack",
+        "tools": "Trash bag untuk sampah ekas memasak, form nilai memasak"
+    },
+    {
+        "day": "jumat",
+        "waktu": "17.00 - 17.30",
+        "kegiatan": "Makan sore",
+        "pj": "Miss Sukma dan Bu Esta",
+        "deskripsi": "Siswa melaksanakan makan bersama dengan kelompoknya di depan tenda masing-masing. Miss Sukma dan Bu Esta membagikan nasi ke setiap kelompok, dan menyampaikan pesan sebelum makan.",
+        "tools": "Makan ersama di lapangan kegiatan"
+    },
+    {
+        "day": "jumat",
+        "waktu": "17.30 - 17.50",
+        "kegiatan": "bersih-bersih  dan Persiapan solat Maghrib",
+        "pj": "Korlap (Pak Edy)",
+        "deskripsi": "Mengondisikan anak untuk membersihkan area masak dan bersih-bersih diri",
+        "tools": "masjid, mic,"
+    },
+    {
+        "day": "jumat",
+        "waktu": "17.50 - 19.00",
+        "kegiatan": "Solat Maghrib, Al-'ma tsurat, dan tilawah surat Al-Kahfi",
+        "pj": "Pak Daffa",
+        "deskripsi": "Melaksanakan solat dan tilawah ditalaqi oleh Pak Daffa surat Al-Kahfi",
+        "tools": "masjid, mic wireless"
+    },
+    {
+        "day": "jumat",
+        "waktu": "19.00 - 19.30",
+        "kegiatan": "Shalat Isya dan tadabur surat Al-Kahfi",
+        "pj": "Pak Daffa",
+        "deskripsi": "Shalat berjamaah diimami oleh Pak Daffa. Tadabur surat Al-Kahfi oleh Pak Hanan",
+        "tools": "masjid, mic wireless"
+    },
+    {
+        "day": "jumat",
+        "waktu": "19.30 - 20.00",
+        "kegiatan": "Persiapan tidur",
+        "pj": "Pak Edy",
+        "deskripsi": "Siswa dipersilahkan untuk ke toilet bergiliran",
+        "tools": "masjid, mic"
+    },
+    {
+        "day": "jumat",
+        "waktu": "20.00 - 01.00",
+        "kegiatan": "Tidur",
+        "pj": "Pak Edi dan tim acara",
+        "deskripsi": "Memastikan siswa sudah tidur dan membaca do'a sebelum tidur terlebih dahulu. piet guru jam 10.00-11.00 (u sukma, miss dewi, u endang) 11.00-12.00 (u lilis, u rani, u nuri) 12.",
+        "tools": "Senter"
+    },
+    {
+        "day": "sabtu",
+        "waktu": "01.45.00-03.30",
+        "kegiatan": "Solat tahajud dan pengondisian posa posan",
+        "pj": "Pak Edy dan tim acara",
+        "deskripsi": "Siswa dipersilahkan untuk berwudhu dan solat tahajud 4 rokaat dan witir 3 rokaat diimami oleh Pak Ilham. Seluruh panitia melaksanakan tahajud bersama siswa. Setelah itu siswa berbaris di lapangan bersama kelompoknya masing-masing sambil menunggu giliran pos-posan, siswa dipersilahkan untuk banyak berdzikir.",
+        "tools": ""
+    },
+    {
+        "day": "sabtu",
+        "waktu": "02.00-04.00",
+        "kegiatan": "Pengondisian dan pos-posan",
+        "pj": "Bu Nuri, Bu Rani",
+        "deskripsi": "1. Pos 1: Emphatetic, PJ: Bu Nuri, penjaga pos: Bu Nuri dan Bu Esta\n2. Pos 2: Manerly PJ: Bu Rani, penjaga pos: Bu Rani dan Pak Ilham\nPos bayangan: Pak Guntur, Pak Hanan, Pak Daffa (tim media). Bu Lilis membantu Pak Edy mengondisikan siswa di lapangan saat posposan akan dimulai\npiket malam 20.00-11.00 (Miss Dewi, Bu Endang, Miss Sukma) 11.00-02.00 (Pak Edi, Om Husein)",
+        "tools": "senter"
+    },
+    {
+        "day": "sabtu",
+        "waktu": "04.15 - 05.00",
+        "kegiatan": "Shalat Subuh, Al-ma'tsurat, Murojaah juz 30",
+        "pj": "Imam Ustad Edy",
+        "deskripsi": "Adzan subuh: Uwais Hamizan Iqomah: Salman, Al-ma'tsurat: Al-Muyassar. Murojaah: Pak Edy. Mrojaah dilaskanakan setelah al-ma'tsurat.  Shalat berjamaah diimami oleh Ustad Edy, Al-ma'tsurat dan murojaah juz 30 dipimpin siswa.",
+        "tools": ""
+    },
+    {
+        "day": "sabtu",
+        "waktu": "05.00 - 05.30",
+        "kegiatan": "Refleksi",
+        "pj": "Miss Dewi",
+        "deskripsi": "Siswa melakukan muhasabah dalam rangka introspeksi diri dan membangun kesadaran dalam beramal soleh yang akan dipandu oleh Miss Dewi",
+        "tools": ""
+    },
+    {
+        "day": "sabtu",
+        "waktu": "05.30-06.00",
+        "kegiatan": "Senam",
+        "pj": "Pak Daffa",
+        "deskripsi": "Siswa melaksanakan senam dengan dipimpin oleh Pak Daffa",
+        "tools": ""
+    },
+    {
+        "day": "sabtu",
+        "waktu": "06.30-07.00",
+        "kegiatan": "Sarapan",
+        "pj": "Miss Sukma",
+        "deskripsi": "Tim konsusmsi membagikan sarapan kepada siswa dan guru, sarapan dilakukan bersama-sama dan diawali dengan pesan sebelum makan yang disampaikan oleh Pak Edy serta berdoa",
+        "tools": ""
+    },
+    {
+        "day": "sabtu",
+        "waktu": "07.00-08.00",
+        "kegiatan": "Bersih Diri, Shalat Dhuha , bongkar tenda",
+        "pj": "Pak Edy",
+        "deskripsi": "Siswa siap-siap untuk pulang merapikan perlengkapan pribadinya untuk dibawa pulang dan bongkar tenda, pengecekan tenda oleh  dan kebersihan area tenda oleh Pak Guntur. Tim acara mendiskusikan siswa dan kelompok terbaik",
+        "tools": "Sound system, mic portabel, rekap nilai"
+    },
+    {
+        "day": "sabtu",
+        "waktu": "08.00-09.00",
+        "kegiatan": "Pelantikan dan Apel Penutupan, pulang",
+        "pj": "Bu Nuri",
+        "deskripsi": "Bu Nuri menyiapkan petugas dan peserta untuk apel. Petugas apel Pemimpin apel: Raya, MC:Akio dan Uwais , pembaca tilawah: Nayyara, pembaca doa: fauzan,  pemimpin pasukan: ziva dan ikrom, dirigen: Khairin, Pembawa baki: Keisha, pembawa bendera merah putih: Maul. Pak Edy dan tim acara mengondisikan siswa untuk apel. Semua panitia mengikuti apel.",
+        "tools": "Mic dan sound system"
+    }
+];
+
+        const outboundData = [
+            {
+                id: "obs-1",
+                sesi: "Survival Tracking",
+                namaPos: "Pos 1: Navigasi & Kompas",
+                pj: "Bu Lilis & Miss Dewi",
+                penjaga: "Bu Lilis, Miss Dewi",
+                aktivitas: "Uji ketepatan arah dan penggunaan kompas lapangan.",
+                instruksi: "Peserta diberikan titik koordinat dan harus menentukan arah mata angin menggunakan kompas menuju pos berikutnya.",
+                aturan: "Kelompok harus kompak dan tiba tepat waktu tanpa meninggalkan anggota.",
+                nilaiKarakter: "Discipline, Leadership, Accuracy",
+                tools: "Kompas bidik, peta saku",
+                catatan: "Penilaian berdasarkan kecepatan dan ketepatan arah."
+            },
+            {
+                id: "obs-2",
+                sesi: "Survival Tracking",
+                namaPos: "Pos 2: Semaphore & Tubing",
+                pj: "Pak Ilham",
+                penjaga: "Pak Ilham & Bu Endang",
+                aktivitas: "Pesan sandi semaphore dan uji keberanian tubing.",
+                instruksi: "Menerjemahkan pesan sandi semaphore yang diberikan penjaga pos, dilanjutkan tantangan ketangkasan air (tubing).",
+                aturan: "Menggunakan pelampung pengaman dengan benar selama kegiatan air.",
+                nilaiKarakter: "Empathetic, Courage, Teamwork",
+                tools: "Bendera semaphore, ban pelampung, peluit",
+                catatan: "Pengawasan ekstra ketat oleh tim keselamatan air."
+            },
+            {
+                id: "obs-3",
+                sesi: "Survival Tracking",
+                namaPos: "Pos 3: Sandi Kotak & Mannerly",
+                pj: "Pak Edy",
+                penjaga: "Pak Daffa & Bu Rani",
+                aktivitas: "Memecahkan sandi kotak dan praktik adab sopan santun (Mannerly).",
+                instruksi: "Memecahkan teka-teki sandi kotak dalam waktu 10 menit, serta mempraktikkan adab berkomunikasi yang santun.",
+                aturan: "Menjaga ketenangan dan kerapian kelompok.",
+                nilaiKarakter: "Mannerly, Problem Solving, Integrity",
+                tools: "Lembar soal sandi kotak, alat tulis",
+                catatan: "Menekankan nilai kesopanan dan ketelitian."
+            },
+            {
+                id: "obs-4",
+                sesi: "Pos-posan Malam",
+                namaPos: "Pos 1 Malam: Empathetic",
+                pj: "Bu Nuri",
+                penjaga: "Bu Nuri & Bu Esta",
+                aktivitas: "Renungan malam dan simulasi empati sosial.",
+                instruksi: "Peserta merenungkan arti kepedulian terhadap sesama di kegelapan malam dengan bimbingan pembina.",
+                aturan: "Menjaga khidmat dan ketenangan suasana.",
+                nilaiKarakter: "Empathetic, Spiritual Awareness",
+                tools: "Lilin pengaman, alas duduk",
+                catatan: "Fokus pada pembentukan kepekaan emosional dan spiritual."
+            },
+            {
+                id: "obs-5",
+                sesi: "Pos-posan Malam",
+                namaPos: "Pos 2 Malam: Mannerly & Kedisiplinan",
+                pj: "Bu Rani",
+                penjaga: "Bu Rani & Pak Ilham",
+                aktivitas: "Evaluasi sikap dan adab malam hari.",
+                instruksi: "Uji mental dan tanya jawab seputar komitmen kedisiplinan selama kegiatan DBA.",
+                aturan: "Jawab dengan jujur dan penuh tanggung jawab.",
+                nilaiKarakter: "Bright Attitude, Discipline, Responsibility",
+                tools: "Buku catatan nilai pos",
+                catatan: "Didampingi oleh Tim Pos Bayangan."
+            },
+            {
+                id: "obs-6",
+                sesi: "Pos-posan Malam",
+                namaPos: "Pos Bayangan & Pengondisian",
+                pj: "Pak Guntur, Pak Hanan, Pak Daffa",
+                penjaga: "Pak Guntur, Pak Hanan, Pak Daffa, Bu Lilis (Koordinator)",
+                aktivitas: "Patroli keliling, pengondisian siswa yang terbangun, dan pengamanan area.",
+                instruksi: "Memastikan seluruh siswa berada di zona aman dan kondusif selama pos malam.",
+                aturan: "Siaga penuh selama jam rawan malam.",
+                nilaiKarakter: "Vigilance, Protection, Dedication",
+                tools: "Senter sorot, handy talkie (HT)",
+                catatan: "Bu Lilis bertindak sebagai pengendali utama pergerakan siswa."
+            }
+        ];
+
+
+        // Klasifikasi gender untuk rekap berdasarkan nama peserta pada daftar ini.
+        const genderByName = {
+            "Ahmad Fauzan Al-Ghifari":"Laki-laki", "Aisyah Humairah Putri":"Perempuan", "Aqila Nada Salsabila":"Perempuan", "Athallah Zidan Pratama":"Laki-laki", "Daffa Haidar Ali":"Laki-laki", "Fatimah Azzahra":"Perempuan", "Hafizh Rabbani":"Laki-laki", "Keysha Aulia Rahman":"Perempuan", "Muhammad Al Fatih":"Laki-laki", "Nandana Putra Pratama":"Laki-laki", "Nayla Rahmawati":"Perempuan", "Rayhan Al Farisi":"Laki-laki", "Safira Salwa Salsabila":"Perempuan", "Zaidan Ilham Ramadhan":"Laki-laki", "Zahra Nur Aini":"Perempuan", "Ibrahim Malik Al-Faruq":"Laki-laki", "Khansa Nabila":"Perempuan", "Rizki Ramadhan":"Laki-laki", "Salma Naurah":"Perempuan", "Yusuf Al-Ayyubi":"Laki-laki"
+        };
+        participantsData.forEach(p => p.gender = genderByName[p.name] || 'Belum ditentukan');
+
+        // --- STATE MANAGEMENT ---
+        let currentPage = 'dashboard';
+        let currentRundownDay = 'jumat';
+        let rundownViewMode = 'grid';
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            initDropdowns();
+            renderPeserta();
+            renderKesehatan();
+            renderRundown();
+            renderOutbound();
+            renderDashboardStats();
+            updateRundownViewMode();
+            switchPage('dashboard');
+            
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobile-close-btn').addEventListener('click', toggleMobileMenu);
+        };
+
+        function genderFromClass(kelas) {
+            const k = String(kelas || '').toLowerCase().replace(/[^a-z]/g, '');
+            if (k === 'atikah' || k === 'rumaysha') return 'Perempuan';
+            if (k === 'zaid' || k === 'zafar' || k === 'jafar') return 'Laki-laki';
+            return 'Belum ditentukan';
+        }
+        function hasSpecialCondition(value) {
+            const v = String(value ?? '').trim().toLowerCase().replace(/[.,;:]/g, ' ').replace(/\s+/g, ' ');
+            return !['', '-', 'tidak', 'tdk', 'tidak ada', 'tidak ada kondisi', 'normal', 'tidak ada keluhan'].includes(v);
+        }
+        participantsData.forEach(p => { p.gender = genderFromClass(p.kelas); });
+        healthData.forEach(p => { p.gender = genderFromClass(p.kelas); p.hasCondition = hasSpecialCondition(p.kondisi); });
+
+        function setText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
+        function renderDashboardStats() {
+            const laki = participantsData.filter(p => p.gender === 'Laki-laki').length;
+            const perempuan = participantsData.filter(p => p.gender === 'Perempuan').length;
+            const catatanKesehatan = healthData.filter(p => p.hasCondition).length;
+            setText('dash-total-peserta', participantsData.length); setText('dash-total-laki', laki); setText('dash-total-perempuan', perempuan);
+            setText('dash-total-kesehatan', catatanKesehatan); setText('dash-total-rundown', rundownData.length); setText('dash-total-outbound', outboundData.length);
+        }
+        function setRundownViewMode(mode) { rundownViewMode = mode === 'table' ? 'table' : 'grid'; updateRundownViewMode(); }
+        function updateRundownViewMode() {
+            const wrap = document.getElementById('rundown-results-wrap');
+            if (wrap) wrap.classList.toggle('rundown-mobile-table-mode', rundownViewMode === 'table');
+            const gridBtn = document.getElementById('rundown-mode-grid'); const tableBtn = document.getElementById('rundown-mode-table');
+            if (gridBtn) gridBtn.classList.toggle('active', rundownViewMode === 'grid');
+            if (tableBtn) tableBtn.classList.toggle('active', rundownViewMode === 'table');
+        }
+
+        function toggleMobileMenu() {
+            const drawer = document.getElementById('mobile-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        function switchPage(page) {
+            currentPage = page;
+            
+            // Hide all views
+            ['dashboard', 'peserta', 'kesehatan', 'rundown', 'outbound'].forEach(p => {
+                document.getElementById(`view-${p}`).classList.add('hidden');
+            });
+            
+            // Show target view
+            document.getElementById(`view-${page}`).classList.remove('hidden');
+            if (page === 'rundown') updateRundownViewMode();
+
+            // Update active state on nav links
+            document.querySelectorAll('.desktop-nav-link, .mobile-nav-link').forEach(el => {
+                el.classList.remove('bg-mentari-light', 'shadow-sm', 'text-white');
+                if(el.getAttribute('data-page') === page) {
+                    el.classList.add('bg-mentari-light', 'shadow-sm', 'text-white');
+                }
+            });
+
+            // Update header info
+            const headers = {
+                dashboard: { icon: 'fa-chart-pie', title: 'Dashboard', desc: 'Ringkasan data utama kegiatan Discipline and Bright Attitude' },
+                peserta: { icon: 'fa-users', title: 'Data Peserta', desc: 'Daftar lengkap siswa peserta kegiatan DBA SMP IT Mentari Ilmu' },
+                kesehatan: { icon: 'fa-notes-medical', title: 'Kesehatan Peserta', desc: 'Catatan kondisi kesehatan, alergi, obat, dan keterangan medis siswa' },
+                rundown: { icon: 'fa-calendar-days', title: 'Rundown Acara', desc: 'Jadwal kegiatan lengkap hari Jumat & Sabtu, 16–17 Oktober 2026' },
+                outbound: { icon: 'fa-person-hiking', title: 'Outbound & Pos Kegiatan', desc: 'Rincian pos survival tracking, pos malam, dan panduan nilai karakter' }
+            };
+
+            document.getElementById('page-icon-header').innerHTML = `<i class="fa-solid ${headers[page].icon}"></i>`;
+            document.getElementById('page-title-header').innerText = headers[page].title;
+            document.getElementById('page-desc-header').innerText = headers[page].desc;
+        }
+
+        function initDropdowns() {
+            // Kelas dropdowns
+            const kelasList = [...new Set(participantsData.map(item => item.kelas))].sort();
+            const ukuranList = [...new Set(participantsData.map(item => item.ukuran))].sort();
+            
+            ['filter-kelas-peserta', 'filter-kelas-kesehatan'].forEach(id => {
+                const select = document.getElementById(id);
+                kelasList.forEach(k => {
+                    const opt = document.createElement('option');
+                    opt.value = k;
+                    opt.textContent = `Kelas ${k}`;
+                    select.appendChild(opt);
+                });
+            });
+
+            const ukuranSelect = document.getElementById('filter-ukuran-peserta');
+            ukuranList.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u;
+                opt.textContent = `Ukuran ${u}`;
+                ukuranSelect.appendChild(opt);
+            });
+
+            // Rundown PJ dropdown
+            const pjList = [...new Set(rundownData.map(item => item.pj))].sort();
+            const pjSelect = document.getElementById('filter-pj-rundown');
+            pjList.forEach(pj => {
+                const opt = document.createElement('option');
+                opt.value = pj;
+                opt.textContent = pj;
+                pjSelect.appendChild(opt);
+            });
+
+            // Outbound PJ dropdown
+            const outboundPjList = [...new Set(outboundData.map(item => item.pj))].sort();
+            const outboundPjSelect = document.getElementById('filter-pj-outbound');
+            outboundPjList.forEach(pj => {
+                const opt = document.createElement('option');
+                opt.value = pj;
+                opt.textContent = pj;
+                outboundPjSelect.appendChild(opt);
+            });
+        }
+
+        // --- RENDER & FILTER: PESERTA ---
+        function renderPeserta() {
+            const search = document.getElementById('search-peserta').value.toLowerCase();
+            const kelas = document.getElementById('filter-kelas-peserta').value;
+            const ukuran = document.getElementById('filter-ukuran-peserta').value;
+            const gender = document.getElementById('filter-gender-peserta').value;
+
+            const filtered = participantsData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search);
+                const matchKelas = kelas === "" || item.kelas === kelas;
+                const matchUkuran = ukuran === "" || item.ukuran === ukuran;
+                const matchGender = gender === "" || item.gender === gender;
+                return matchSearch && matchKelas && matchUkuran && matchGender;
+            });
+
+            const tbody = document.getElementById('table-peserta-body');
+            tbody.innerHTML = "";
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400"><i class="fa-solid fa-folder-open text-2xl mb-2"></i><br>Tidak ada data peserta yang sesuai filter.</td></tr>`;
+            } else {
+                filtered.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-medium text-slate-500">${index + 1}</td>
+                        <td class="py-3 px-6 font-semibold text-slate-800">${item.name}</td>
+                        <td class="py-3 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">${item.kelas}</span></td>
+                        <td class="py-3 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${item.gender === 'Perempuan' ? 'bg-pink-50 text-pink-700 border border-pink-200' : 'bg-sky-50 text-sky-700 border border-sky-200'}">${item.gender}</span></td>
+                        <td class="py-3 px-6"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${item.ukuran}</span></td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="showPesertaDetail(${item.no})" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-mentari rounded-lg transition" title="Lihat Detail">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('count-peserta-total').textContent = participantsData.length;
+            document.getElementById('count-peserta-filtered').textContent = filtered.length;
+            setText('stat-peserta-total', participantsData.length); setText('stat-peserta-laki', participantsData.filter(p => p.gender === 'Laki-laki').length); setText('stat-peserta-perempuan', participantsData.filter(p => p.gender === 'Perempuan').length);
+            renderDashboardStats();
+        }
+
+        function filterPeserta() { renderPeserta(); }
+        function resetPesertaFilter() {
+            document.getElementById('search-peserta').value = "";
+            document.getElementById('filter-kelas-peserta').value = "";
+            document.getElementById('filter-ukuran-peserta').value = "";
+            document.getElementById('filter-gender-peserta').value = "";
+            renderPeserta();
+        }
+
+        function showPesertaDetail(no) {
+            const data = participantsData.find(i => i.no === no);
+            if(!data) return;
+            
+            const content = `
+                <div class="space-y-3">
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Nama Peserta</span>
+                        <div class="text-lg font-bold text-slate-800 mt-0.5">${data.name}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kelas</span>
+                            <div class="font-bold text-slate-800 mt-0.5">${data.kelas}</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ukuran Pakaian</span>
+                            <div class="font-bold text-slate-800 mt-0.5">${data.ukuran}</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500">
+                        <i class="fa-solid fa-circle-info mr-1 text-mentari"></i> Data bersumber resmi dari arsip administrasi kegiatan DBA SMP IT Mentari Ilmu Karawang.
+                    </div>
+                </div>
+            `;
+            openDetailModal("Detail Peserta DBA", content);
+        }
+
+        // --- RENDER & FILTER: KESEHATAN ---
+        function renderKesehatan() {
+            const search = document.getElementById('search-kesehatan').value.toLowerCase();
+            const kelas = document.getElementById('filter-kelas-kesehatan').value;
+            const kondisi = document.getElementById('filter-kondisi-kesehatan').value;
+            const gender = document.getElementById('filter-gender-kesehatan').value;
+
+            const filtered = healthData.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || item.kondisi.toLowerCase().includes(search) || item.alergi.toLowerCase().includes(search);
+                const matchKelas = kelas === "" || item.kelas === kelas;
+                const matchGender = gender === "" || item.gender === gender;
+                const matchKondisi = kondisi === "" || (kondisi === "ada" ? item.hasCondition : !item.hasCondition);
+                return matchSearch && matchKelas && matchGender && matchKondisi;
+            });
+
+            const tbody = document.getElementById('table-kesehatan-body');
+            tbody.innerHTML = "";
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400"><i class="fa-solid fa-notes-medical text-2xl mb-2"></i><br>Tidak ada data kesehatan yang sesuai filter.</td></tr>`;
+            } else {
+                filtered.forEach((item, index) => {
+                    const hasCondition = item.hasCondition;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition border-b border-slate-100 text-xs";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-center font-medium text-slate-500">${index + 1}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">${item.kelas}</span></td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full font-semibold ${item.gender === 'Perempuan' ? 'bg-pink-50 text-pink-700 border border-pink-200' : 'bg-sky-50 text-sky-700 border border-sky-200'}">${item.gender}</span></td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-700">${item.ukuran}</span></td>
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 rounded-full font-medium ${hasCondition ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-600'}">
+                                ${item.kondisi}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-600">${item.alergi}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.obat}</td>
+                        <td class="py-3 px-4 text-slate-600">${item.catatan}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="showKesehatanDetail(${item.no})" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-mentari rounded-lg transition" title="Lihat Detail Medis">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('count-kesehatan-total').textContent = healthData.length;
+            document.getElementById('count-kesehatan-filtered').textContent = filtered.length;
+            const khusus = healthData.filter(h => h.hasCondition).length;
+            setText('stat-kesehatan-total', healthData.length);
+            setText('stat-kesehatan-laki', healthData.filter(h => h.gender === 'Laki-laki').length);
+            setText('stat-kesehatan-perempuan', healthData.filter(h => h.gender === 'Perempuan').length);
+            setText('stat-kesehatan-khusus', khusus); setText('stat-kesehatan-normal', healthData.length-khusus); renderDashboardStats();
+        }
+
+        function filterKesehatan() { renderKesehatan(); }
+        function resetKesehatanFilter() {
+            document.getElementById('search-kesehatan').value = "";
+            document.getElementById('filter-kelas-kesehatan').value = "";
+            document.getElementById('filter-gender-kesehatan').value = "";
+            document.getElementById('filter-kondisi-kesehatan').value = "";
+            renderKesehatan();
+        }
+
+        function showKesehatanDetail(no) {
+            const data = healthData.find(i => i.no === no);
+            if(!data) return;
+
+            const content = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Nama Peserta & Kelas</span>
+                        <div class="text-lg font-bold text-slate-800 mt-0.5">${data.name} <span class="text-sm font-normal text-emerald-700">(${data.kelas})</span></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ukuran Pakaian</span>
+                            <div class="font-bold text-slate-800 mt-0.5">${data.ukuran}</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kondisi Kesehatan</span>
+                            <div class="font-bold text-slate-800 mt-0.5 text-amber-700">${data.kondisi}</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Alergi & Pemicunya</span>
+                        <div class="font-medium text-slate-800">${data.alergi}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Informasi Obat Konsumsi</span>
+                        <div class="font-medium text-slate-800">${data.obat}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Catatan Tambahan untuk Wali Kelas</span>
+                        <div class="font-medium text-slate-800">${data.catatan}</div>
+                    </div>
+                </div>
+            `;
+            openDetailModal("Detail Kesehatan & Medis", content);
+        }
+
+        // --- RENDER & FILTER: RUNDOWN ---
+        function switchRundownDay(day) {
+            currentRundownDay = day;
+            document.getElementById('tab-day-jumat').className = day === 'jumat' ? "flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-bold transition bg-mentari text-white shadow-sm" : "flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900";
+            document.getElementById('tab-day-sabtu').className = day === 'sabtu' ? "flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-bold transition bg-mentari text-white shadow-sm" : "flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900";
+            renderRundown();
+        }
+
+        function renderRundown() {
+            const search = document.getElementById('search-rundown').value.toLowerCase();
+            const pj = document.getElementById('filter-pj-rundown').value;
+
+            const filtered = rundownData.filter(item => {
+                const matchDay = item.day === currentRundownDay;
+                const matchSearch = item.kegiatan.toLowerCase().includes(search) || item.deskripsi.toLowerCase().includes(search) || item.tools.toLowerCase().includes(search);
+                const matchPj = pj === "" || item.pj === pj;
+                return matchDay && matchSearch && matchPj;
+            });
+
+            setText('stat-rundown-hari', rundownData.filter(item => item.day === currentRundownDay).length);
+            setText('stat-rundown-total', rundownData.length);
+            setText('stat-rundown-pj', new Set(rundownData.filter(item => item.day === currentRundownDay).map(item => item.pj).filter(Boolean)).size);
+            renderDashboardStats();
+            const tbody = document.getElementById('table-rundown-body');
+            tbody.innerHTML = "";
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400"><i class="fa-solid fa-calendar-days text-2xl mb-2"></i><br>Tidak ada agenda rundown yang sesuai.</td></tr>`;
+            } else {
+                filtered.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition border-b border-slate-100 text-xs";
+                    tr.innerHTML = `
+                        <td data-label="Waktu" class="py-3 px-4"><span class="rundown-time-badge"><i class="fa-regular fa-clock"></i>${item.waktu}</span></td>
+                        <td data-label="Kegiatan" class="py-3 px-6 font-bold text-slate-800">${item.kegiatan}</td>
+                        <td data-label="Penanggung Jawab" class="py-3 px-5"><span class="rundown-pj-badge">${item.pj || 'Belum ditentukan'}</span></td>
+                        <td data-label="Deskripsi & Rincian" class="rundown-description-cell py-3 px-6 text-slate-600"><div class="rundown-description">${item.deskripsi}</div></td>
+                        <td data-label="Tools / Perlengkapan" class="py-3 px-5 text-slate-500 italic">${item.tools}</td>
+                        <td data-label="Detail" class="rundown-detail-cell py-3 px-4 text-center">
+                            <button onclick="showRundownDetailByIndex(${rundownData.indexOf(item)})" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-mentari rounded-lg transition" title="Lihat Detail">
+                                <i class="fa-solid fa-eye text-xs"></i><span class="ml-1">Lihat detail</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        function filterRundown() { renderRundown(); }
+        function resetRundownFilter() {
+            document.getElementById('search-rundown').value = "";
+            document.getElementById('filter-pj-rundown').value = "";
+            renderRundown();
+        }
+
+        function showRundownDetailByIndex(index) {
+            const item = rundownData[index];
+            if (!item) return;
+            showRundownDetail(item);
+        }
+
+        function showRundownDetail(item) {
+            const content = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider">${item.day === 'jumat' ? 'Jumat, 16 Oktober 2026' : 'Sabtu, 17 Oktober 2026'} • ${item.waktu}</div>
+                        <div class="text-lg font-bold text-slate-800 mt-1">${item.kegiatan}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Penanggung Jawab (PJ)</span>
+                        <div class="font-bold text-slate-800">${item.pj}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Deskripsi & Rincian Kegiatan</span>
+                        <div class="font-medium text-slate-800 leading-relaxed whitespace-pre-line break-words">${item.deskripsi}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tools / Perlengkapan</span>
+                        <div class="font-medium text-slate-700 italic">${item.tools}</div>
+                    </div>
+                </div>
+            `;
+            openDetailModal("Detail Agenda Kegiatan", content);
+        }
+
+        // --- RENDER & FILTER: OUTBOUND ---
+        function renderOutbound() {
+            const search = document.getElementById('search-outbound').value.toLowerCase();
+            const sesi = document.getElementById('filter-sesi-outbound').value;
+            const pj = document.getElementById('filter-pj-outbound').value;
+
+            const filtered = outboundData.filter(item => {
+                const matchSearch = item.namaPos.toLowerCase().includes(search) || item.aktivitas.toLowerCase().includes(search) || item.instruksi.toLowerCase().includes(search);
+                const matchSesi = sesi === "" || item.sesi === sesi;
+                const matchPj = pj === "" || item.pj === pj;
+                return matchSearch && matchSesi && matchPj;
+            });
+
+            const grid = document.getElementById('outbound-grid');
+            grid.innerHTML = "";
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 py-12 text-center text-slate-400 bg-white rounded-2xl border border-slate-200"><i class="fa-solid fa-person-hiking text-3xl mb-2"></i><br>Tidak ada pos outbound yang sesuai filter.</div>`;
+            } else {
+                filtered.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition";
+                    card.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">${item.sesi}</span>
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${item.nilaiKarakter.split(',')[0]}</span>
+                            </div>
+                            <h3 class="font-bold text-base text-slate-800">${item.namaPos}</h3>
+                            <div class="text-xs text-slate-600 space-y-1">
+                                <p><strong class="text-slate-700">PJ / Penjaga:</strong> ${item.penjaga}</p>
+                                <p><strong class="text-slate-700">Aktivitas:</strong> ${item.aktivitas}</p>
+                            </div>
+                        </div>
+                        <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-500 italic truncate max-w-[200px]">Tools: ${item.tools}</span>
+                            <button onclick='showOutboundDetail(${JSON.stringify(item)})' class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-mentari text-xs font-semibold rounded-xl transition flex items-center space-x-1">
+                                <span>Detail Pos</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            document.getElementById('count-outbound-total').textContent = outboundData.length;
+            document.getElementById('count-outbound-filtered').textContent = filtered.length;
+            setText('stat-outbound-total', outboundData.length); setText('stat-outbound-sesi', new Set(outboundData.map(o => o.sesi).filter(Boolean)).size); setText('stat-outbound-pj', new Set(outboundData.map(o => o.pj || o.penjaga).filter(Boolean)).size); renderDashboardStats();
+        }
+
+        function filterOutbound() { renderOutbound(); }
+        function resetOutboundFilter() {
+            document.getElementById('search-outbound').value = "";
+            document.getElementById('filter-sesi-outbound').value = "";
+            document.getElementById('filter-pj-outbound').value = "";
+            renderOutbound();
+        }
+
+        function showOutboundDetail(item) {
+            const content = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">${item.sesi}</span>
+                        <div class="text-lg font-bold text-slate-800 mt-1">${item.namaPos}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Penanggung Jawab (PJ)</span>
+                            <div class="font-bold text-slate-800 mt-0.5">${item.pj}</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Penjaga Pos</span>
+                            <div class="font-bold text-slate-800 mt-0.5">${item.penjaga}</div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aktivitas Utama</span>
+                        <div class="font-medium text-slate-800">${item.aktivitas}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Instruksi Permainan</span>
+                        <div class="font-medium text-slate-800 leading-relaxed">${item.instruksi}</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Aturan & Catatan Keselamatan</span>
+                        <div class="font-medium text-slate-800">${item.aturan} (${item.catatan})</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nilai Karakter</span>
+                            <div class="font-bold text-emerald-800 mt-0.5">${item.nilaiKarakter}</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Peralatan (Tools)</span>
+                            <div class="font-bold text-slate-800 mt-0.5">${item.tools}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            openDetailModal("Detail Pos Outbound", content);
+        }
+
+        // --- MODAL CONTROLLER ---
+        function openDetailModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        // --- EXPORT FUNCTIONS (EXCEL & PDF) ---
+        function exportExcelPeserta() {
+            const dataToExport = participantsData.map((item, index) => ({
+                "No": index + 1,
+                "Nama Lengkap Siswa": item.name,
+                "Kelas": item.kelas,
+                "Jenis Kelamin": item.gender,
+                "Ukuran Pakaian": item.ukuran
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data Peserta");
+            XLSX.writeFile(wb, "Data_Peserta_DBA_Mentari_Ilmu.xlsx");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File Excel Data Peserta berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportPdfPeserta() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(16);
+            doc.setTextColor(46, 71, 62);
+            doc.text("SMP IT MENTARI ILMU KARAWANG", 14, 20);
+            doc.setFontSize(11);
+            doc.text("Data Peserta Kegiatan Discipline and Bright Attitude (DBA) 2026", 14, 27);
+            doc.text("Tanggal: 16–17 Oktober 2026 | Lokasi: Sari Ater Campervan, Subang", 14, 33);
+
+            const tableData = participantsData.map((item, index) => [index + 1, item.name, item.kelas, item.gender, item.ukuran]);
+
+            doc.autoTable({
+                startY: 40,
+                head: [['No', 'Nama Lengkap Siswa', 'Kelas', 'Jenis Kelamin', 'Ukuran Pakaian']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [46, 71, 62] }
+            });
+
+            doc.save("Data_Peserta_DBA_Mentari_Ilmu.pdf");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File PDF Data Peserta berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportExcelKesehatan() {
+            const dataToExport = healthData.map((item, index) => ({
+                "No": index + 1,
+                "Nama Siswa": item.name,
+                "Kelas": item.kelas,
+                "Jenis Kelamin": item.gender,
+                "Ukuran": item.ukuran,
+                "Kondisi Kesehatan": item.kondisi,
+                "Alergi & Pemicu": item.alergi,
+                "Informasi Obat": item.obat,
+                "Catatan Tambahan": item.catatan
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Kesehatan Peserta");
+            XLSX.writeFile(wb, "Kesehatan_Peserta_DBA_Mentari_Ilmu.xlsx");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File Excel Kesehatan Peserta berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportPdfKesehatan() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            
+            doc.setFontSize(16);
+            doc.setTextColor(46, 71, 62);
+            doc.text("SMP IT MENTARI ILMU KARAWANG", 14, 20);
+            doc.setFontSize(11);
+            doc.text("Data Kesehatan Peserta Kegiatan DBA 2026 (Internal Admin)", 14, 27);
+
+            const tableData = healthData.map((item, index) => [
+                index + 1, item.name, item.kelas, item.gender, item.ukuran, item.kondisi, item.alergi, item.obat, item.catatan
+            ]);
+
+            doc.autoTable({
+                startY: 35,
+                head: [['No', 'Nama Siswa', 'Kelas', 'Jenis Kelamin', 'Ukuran', 'Kondisi Kesehatan', 'Alergi & Pemicu', 'Informasi Obat', 'Catatan Tambahan']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [46, 71, 62] },
+                styles: { fontSize: 8 }
+            });
+
+            doc.save("Kesehatan_Peserta_DBA_Mentari_Ilmu.pdf");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File PDF Kesehatan Peserta berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportExcelRundown() {
+            const dataToExport = rundownData.map((item, index) => ({
+                "Hari": item.day.toUpperCase(),
+                "Waktu": item.waktu,
+                "Kegiatan": item.kegiatan,
+                "Penanggung Jawab (PJ)": item.pj,
+                "Deskripsi": item.deskripsi,
+                "Tools / Perlengkapan": item.tools
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rundown Acara");
+            XLSX.writeFile(wb, "Rundown_Acara_DBA_Mentari_Ilmu.xlsx");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File Excel Rundown Acara berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportPdfRundown() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            
+            doc.setFontSize(16);
+            doc.setTextColor(46, 71, 62);
+            doc.text("SMP IT MENTARI ILMU KARAWANG", 14, 20);
+            doc.setFontSize(11);
+            doc.text("Rundown Acara Kegiatan DBA 2026 (Jumat & Sabtu, 16-17 Oktober 2026)", 14, 27);
+
+            const tableData = rundownData.map(item => [
+                item.day.toUpperCase(), item.waktu, item.kegiatan, item.pj, item.deskripsi, item.tools
+            ]);
+
+            doc.autoTable({
+                startY: 35,
+                head: [['Hari', 'Waktu', 'Kegiatan', 'PJ', 'Deskripsi', 'Tools / Perlengkapan']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [46, 71, 62] },
+                styles: { fontSize: 8 }
+            });
+
+            doc.save("Rundown_Acara_DBA_Mentari_Ilmu.pdf");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File PDF Rundown Acara berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportExcelOutbound() {
+            const dataToExport = outboundData.map((item, index) => ({
+                "No": index + 1,
+                "Sesi": item.sesi,
+                "Nama Pos": item.namaPos,
+                "PJ": item.pj,
+                "Penjaga Pos": item.penjaga,
+                "Aktivitas": item.aktivitas,
+                "Instruksi": item.instruksi,
+                "Nilai Karakter": item.nilaiKarakter,
+                "Tools": item.tools
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Outbound & Pos");
+            XLSX.writeFile(wb, "Outbound_DBA_Mentari_Ilmu.xlsx");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File Excel Outbound berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+
+        function exportPdfOutbound() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            
+            doc.setFontSize(16);
+            doc.setTextColor(46, 71, 62);
+            doc.text("SMP IT MENTARI ILMU KARAWANG", 14, 20);
+            doc.setFontSize(11);
+            doc.text("Data Outbound & Pos Kegiatan DBA 2026", 14, 27);
+
+            const tableData = outboundData.map((item, index) => [
+                index + 1, item.sesi, item.namaPos, item.penjaga, item.aktivitas, item.nilaiKarakter, item.tools
+            ]);
+
+            doc.autoTable({
+                startY: 35,
+                head: [['No', 'Sesi', 'Nama Pos', 'Penjaga', 'Aktivitas', 'Nilai Karakter', 'Tools']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [46, 71, 62] },
+                styles: { fontSize: 8 }
+            });
+
+            doc.save("Outbound_DBA_Mentari_Ilmu.pdf");
+            Swal.fire({ icon: 'success', title: 'Berhasil', text: 'File PDF Outbound berhasil diunduh.', timer: 2000, showConfirmButton: false });
+        }
+    </script>
+</body>
+</html>
